@@ -482,11 +482,33 @@ var obj = {
   }
 }
 
+
+// See below issue:
+// https://github.com/less/less.js/issues/2758
+// https://github.com/less/less.js/issues/2597
+
+// http://stackoverflow.com/questions/20336086/how-to-extract-less-js-parser-results-as-object-instead-compiled-css-with-tocss
+// To get a LESS syntax tree, use Parser
 // Parser(context:{}, imports:{ contents: {filename:'str'} }, rootFileInfo: {relativeUrls:true, rootpath: "/", filename: 'main.less'})
 var ppp, parser = new(less.Parser)({}, {contents: {}}, {})
-parser.parse('x {y: (2px + 1)}', function (e, tree) {
+parser.parse('@a:1+2; x {y: (2px + 1)}', function (e, tree) {
   console.log(tree)
-  ppp = tree.rules[0].rules[0].value.value[0]
+  // ppp = tree.rules[0].rules[0].value.value[0].value[0]
+})
+
+// To get LESS css result, use render
+// input, options, cb
+less.render('x {y: (2px + 1)}', {}, function (err, root) {
+ console.log(err, root)
+})
+
+
+
+// To get LESS css result, use render
+// input, options, cb
+less.parse('x {y: (2px + 1)}', {}, function (err, root, imports, options) {
+  var p = new less.ParseTree(root, imports)
+  console.log(err, root, p, options, p.root.rules[0].rules[0].value.value[0].value[0])
 })
 
 
