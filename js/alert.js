@@ -407,9 +407,10 @@ function _getVar(name, node) {
   }
 }
 
-function getVar(name) {
+function getVar(name, context) {
+  context = context || {}
   return function (prev, node) {
-    var val = _getVar(name, node)
+    var val = context[name] || _getVar(name, node)
     console.log(name, val)
     return val
   }
@@ -434,26 +435,46 @@ var Value = function(val) {
 
   var match = val.match(/^([0-9.]+)([a-z%]*)/i)
   if(match) return new Dimension(match[1], match[2])
+
+  return val
 }
 
 var Color = less.tree.Color
 var Dimension = less.tree.Dimension
 
+var $mixins = {
+  '.alert-variant': function ($1, $2, $3) {
+    var context = {
+      '@background': $1,
+      '@border': $2,
+      '@text-color': $3
+    }
+    var map = function(name) {
+      name = context[name]||name
+      console.log(111, name)
+      return name.charAt(0)=='@' ? getVar(name) : name
+    }
+    return {
+      backgroundColor: map('@background'),
+      borderColor: map('@border'),
+      color: map('@text-color'),
+      padding: map('@alert-padding'),
+      hr: {
+        color: 'red',
+        borderTopColor: 'darken(@border, 5%)'
+      },
+      '.alert-link': {
+        color: 'darken(@text-color, 10%)'
+      }
+    }
+  }
+}
+
+
 var obj = {
-  '$vars': $vars,
+  $vars: $vars,
 
   // mixins
-  '.alert-variant(@background; @border; @text-color)': {
-    backgroundColor: '@background',
-    borderColor: '@border',
-    color: '@text-color',
-    hr: {
-      borderTopColor: 'darken(@border, 5%)'
-    },
-    '.alert-link': {
-      color: 'darken(@text-color, 10%)'
-    }
-  },
 
 
   '.alert': {
@@ -493,8 +514,19 @@ var obj = {
   '.alert-warning': {
     '.alert-variant(@alert-warning-bg; @alert-warning-border; @alert-warning-text)': {}
   },
-  '.alert-danger': {
-    '.alert-variant(@alert-danger-bg; @alert-danger-border; @alert-danger-text)': {}
+  '.alert-danger': Object.assign({
+    $vars:{
+      'close-color': '#888'
+    }
+    // '.alert-variant(@alert-danger-bg; @alert-danger-border; @alert-danger-text)': {}
+  }, $mixins['.alert-variant']('#fff', '@close-color', '#333'))
+}
+
+function mixins(name, params) {
+  return function(prev, node) {
+    Object.keys(obj).forEach(function(v) {
+      node.prop[v] = [obj[v]]
+    })
   }
 }
 
