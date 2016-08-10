@@ -393,14 +393,6 @@ function mixin(sel, param) {
 
 }
 
-function Color(val) {
-  return new less.tree.Color(val)
-}
-
-function Value(val) {
-  return new less.tree.Value(val)
-}
-
 function getFuncion(name) {
   var args = [].slice.call(arguments, 1)
   return less.functions.functionRegistry.get(name).apply(null, args)
@@ -422,6 +414,30 @@ function getVar(name) {
     return val
   }
 }
+
+// operation for css value
+function Operation(op, op1, op2) {
+  return function(prev, node) {
+    var p = [op1, op2].map(function(v) {
+      if(Array.isArray(v)) v = Operation.apply(null, v)(prev, node)
+      if(v.type) return v
+      v+=''
+      return v.charAt(0)=='@' ? Value(getVar(v)(prev,node)) : Value(v)
+    })
+    var val = p[0].operate({}, op, p[1])
+    return this ? val.toCSS() : val
+  }
+}
+
+var Value = function(val) {
+  if(val.charAt(0)=='#') return new Color(val.slice(1))
+
+  var match = val.match(/^([0-9.]+)([a-z%]*)/i)
+  if(match) return new Dimension(match[1], match[2])
+}
+
+var Color = less.tree.Color
+var Dimension = less.tree.Dimension
 
 var obj = {
   '$vars': $vars,
@@ -460,7 +476,7 @@ var obj = {
     }
   },
   '.alert-dismissable,  .alert-dismissible': {
-    paddingRight: '(@alert-padding + 20)',
+    paddingRight: Operation('+', '@alert-padding', ['-', '@alert-padding', ['+', 5, 10]]),
     '.close': {
       position: 'relative',
       top: '-2px',
@@ -469,16 +485,16 @@ var obj = {
     }
   },
   '.alert-success': {
-    '.alert-variant(@alert-success-bg; @alert-success-border; @alert-success-text)abcd': {}
+    '.alert-variant(@alert-success-bg; @alert-success-border; @alert-success-text)': {}
   },
   '.alert-info': {
-    '.alert-variant(@alert-info-bg; @alert-info-border; @alert-info-text)abcd': {}
+    '.alert-variant(@alert-info-bg; @alert-info-border; @alert-info-text)': {}
   },
   '.alert-warning': {
-    '.alert-variant(@alert-warning-bg; @alert-warning-border; @alert-warning-text)abcd': {}
+    '.alert-variant(@alert-warning-bg; @alert-warning-border; @alert-warning-text)': {}
   },
   '.alert-danger': {
-    '.alert-variant(@alert-danger-bg; @alert-danger-border; @alert-danger-text)abcd': {}
+    '.alert-variant(@alert-danger-bg; @alert-danger-border; @alert-danger-text)': {}
   }
 }
 
@@ -491,7 +507,7 @@ var obj = {
 // To get a LESS syntax tree, use Parser
 // Parser(context:{}, imports:{ contents: {filename:'str'} }, rootFileInfo: {relativeUrls:true, rootpath: "/", filename: 'main.less'})
 var ppp, parser = new(less.Parser)({}, {contents: {}}, {})
-parser.parse('@a:1+2; x {y: (2px + 1)}', function (e, tree) {
+parser.parse('@a:2px; @b:#333; x {y: (2px + 1)}', function (e, tree) {
   console.log(tree)
   // ppp = tree.rules[0].rules[0].value.value[0].value[0]
 })
@@ -506,9 +522,18 @@ less.render('x {y: (2px + 1)}', {}, function (err, root) {
 
 // To get LESS css result, use render
 // input, options, cb
-less.parse('x {y: (2px + 1)}', {}, function (err, root, imports, options) {
+less.parse('x {y: (2px + 1 - 10px)}', {}, function (err, root, imports, options) {
   var p = new less.ParseTree(root, imports)
-  console.log(err, root, p, options, p.root.rules[0].rules[0].value.value[0].value[0])
+  console.log(err, root, p, options)
 })
 
 
+// Calc 2 demension by op
+var d1 = new less.tree.Dimension(2, 'px')
+var d2 = new less.tree.Dimension(3, 'cm')
+
+console.log( d1.operate({}, '+', d2) )
+
+
+// Color op
+// (new less.tree.Color('fff')).toCSS()
