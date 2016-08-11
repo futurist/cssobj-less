@@ -1,12 +1,17 @@
 {
   "name": "cssobj-less",
   "version": "1.0.0",
-  "description": "",
+  "description": "Less in JS, using cssobj lib.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "make": "browserify src/index.js -o build.js"
+    "make": "browserify src/index.js -o build.js && gulp bump"
   },
-  "author": "",
-  "license": "ISC"
+  "keywords":[
+    "less",
+    "cssobj",
+    "bootstrap"
+  ],
+  "author": "James Yang <jamesyang999@gmail.com>",
+  "license": "MIT"
 }
