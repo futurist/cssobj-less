@@ -2589,17 +2589,7 @@ var obj = {
   )
 }
 
-var result = cssobj(obj, {
-  local:false,
-  onUpdate: cssobj_plugin_post_csstext(function(v) {
-    console.log(v)
-  }),
-  plugins:{
-    value: lessValuePlugin()
-  }
-})
-
-console.log(result)
+module.exports = obj
 
 },{"./bs-vars.js":37,"./less-helper.js":39}],37:[function(require,module,exports){
 // all bootstrap vars
@@ -3002,13 +2992,33 @@ module.exports = {
 }
 
 },{"./less-helper.js":39}],38:[function(require,module,exports){
-require('./normalize.js')
-require('./scaffolding.js')
-require('./alert.js')
+var extend = require('objutil').extend
+var normalize = require('./normalize.js')
+var scaffolding = require('./scaffolding.js')
+var alert = require('./alert.js')
+var lessHelper = require('./less-helper.js')
+
+var obj = extend(
+  {},
+  normalize,
+  scaffolding,
+  alert
+)
+
+var result = cssobj(obj, {
+  onUpdate: cssobj_plugin_post_csstext(function(v) {
+    console.log(v)
+  }),
+  plugins:{
+    value: lessHelper.lessValuePlugin()
+  }
+})
+
+console.log(result)
 
 
 
-},{"./alert.js":36,"./normalize.js":40,"./scaffolding.js":41}],39:[function(require,module,exports){
+},{"./alert.js":36,"./less-helper.js":39,"./normalize.js":40,"./scaffolding.js":41,"objutil":35}],39:[function(require,module,exports){
 'use strict'
 // use strict-mode to get func.call work with right this
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/call
@@ -3270,7 +3280,8 @@ var obj = {
 }
 
 
-cssobj(obj)
+module.exports = obj
+
 
 
 },{}],41:[function(require,module,exports){
@@ -3387,15 +3398,6 @@ var obj = {
   }
 }
 
-var result = cssobj(obj, {
-  onUpdate: cssobj_plugin_post_csstext(function(v) {
-    console.log(v)
-  }),
-  plugins:{
-    value: lessValuePlugin()
-  }
-})
-
-console.log(result)
+module.exports = obj
 
 },{"./bs-vars.js":37,"./less-helper.js":39}]},{},[38]);

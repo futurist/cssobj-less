@@ -143,5 +143,6 @@ var obj = {
 }
 
 
-cssobj(obj)
+module.exports = obj
+
 

@@ -75,14 +75,4 @@ var obj = {
   )
 }
 
-var result = cssobj(obj, {
-  local:false,
-  onUpdate: cssobj_plugin_post_csstext(function(v) {
-    console.log(v)
-  }),
-  plugins:{
-    value: lessValuePlugin()
-  }
-})
-
-console.log(result)
+module.exports = obj

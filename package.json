@@ -1,11 +1,12 @@
 {
   "name": "cssobj-less",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Less in JS, using cssobj lib.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "make": "browserify src/index.js -o build.js && gulp bump"
+    "make": "browserify src/index.js -o build.js",
+    "bump": "gulp bump"
   },
   "keywords":[
     "less",
