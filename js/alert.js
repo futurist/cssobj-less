@@ -1,3 +1,7 @@
+'use strict'
+// use strict-mode to get func.call work with right this
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/call
+
 var $vars = {
   'gray-base': '#000',
   'gray-darker': 'lighten(@gray-base, 13.5%)',
@@ -29,7 +33,7 @@ var $vars = {
   'font-size-h5': '@font-size-base',
   'font-size-h6': 'ceil((@font-size-base * 0.85))',
   'line-height-base': 1.428571429,
-  'line-height-computed': 'floor((@font-size-base * @line-height-base))',
+  'line-height-computed': getFuncion('floor', Operation('*', '@font-size-base', '@line-height-base')),
   'headings-font-family': 'inherit',
   'headings-font-weight': 500,
   'headings-line-height': 1.1,
@@ -225,16 +229,16 @@ var $vars = {
   'jumbotron-heading-font-size': 'ceil((@font-size-base * 4.5))',
   'state-success-text': '#3c763d',
   'state-success-bg': '#dff0d8',
-  'state-success-border': 'darken(spin(@state-success-bg, -10), 5%)',
+  'state-success-border': getFuncion('darken', getFuncion('spin', '@state-success-bg', -10), '5%'),
   'state-info-text': '#31708f',
   'state-info-bg': '#d9edf7',
-  'state-info-border': 'darken(spin(@state-info-bg, -10), 7%)',
+  'state-info-border': getFuncion('darken', getFuncion('spin', '@state-info-bg', -10), '7%'),
   'state-warning-text': '#8a6d3b',
   'state-warning-bg': '#fcf8e3',
-  'state-warning-border': 'darken(spin(@state-warning-bg, -10), 5%)',
+  'state-warning-border': getFuncion('darken', getFuncion('spin', '@state-warning-bg', -10), '5%'),
   'state-danger-text': '#a94442',
   'state-danger-bg': '#f2dede',
-  'state-danger-border': 'darken(spin(@state-danger-bg, -10), 5%)',
+  'state-danger-border': getFuncion('darken', getFuncion('spin', '@state-danger-bg', -10), '5%'),
   'tooltip-max-width': '200px',
   'tooltip-color': '#fff',
   'tooltip-bg': '#000',
@@ -273,7 +277,7 @@ var $vars = {
   'modal-md': '600px',
   'modal-sm': '300px',
   'alert-padding': '15px',
-  'alert-border-radius': getVar('@border-radius-base'),
+  'alert-border-radius': '@border-radius-base',
   'alert-link-font-weight': 'bold',
   'alert-success-bg': '@state-success-bg',
   'alert-success-text': '@state-success-text',
@@ -388,14 +392,21 @@ var $vars = {
   'hr-border': '@gray-lighter'
 }
 
-
-function mixin(sel, param) {
-
-}
-
+// invoke LESS Functions with param
 function getFuncion(name) {
   var args = [].slice.call(arguments, 1)
-  return less.functions.functionRegistry.get(name).apply(null, args)
+  return function(prev, node) {
+    var ret =less.functions.functionRegistry.get(name).apply(null, args.map(function(val) {
+      return _getObj(val, node)
+    }))
+    return this ? ret.toCSS() : ret
+  }
+}
+
+function _getObj(v, node) {
+  if(v.type) return v
+  if(typeof v=='function') return v.call(null, null, node)
+  return typeof v=='string' && v.charAt(0)=='@' ? lessObj(getVar(v)(null,node)) : lessObj(v)
 }
 
 function _getVar(name, node) {
@@ -407,31 +418,41 @@ function _getVar(name, node) {
   }
 }
 
+// getVar from node.$var value
 function getVar(name, context) {
   context = context || {}
   return function (prev, node) {
     var val = context[name] || _getVar(name, node)
-    console.log(name, val)
     return val
   }
 }
 
-// operation for css value
+// operation for css value, Dimension, Color
 function Operation(op, op1, op2) {
   return function(prev, node) {
     var p = [op1, op2].map(function(v) {
       if(Array.isArray(v)) v = Operation.apply(null, v)(prev, node)
-      if(v.type) return v
-      v+=''
-      return v.charAt(0)=='@' ? Value(getVar(v)(prev,node)) : Value(v)
+      return _getObj(v, node)
     })
     var val = p[0].operate({}, op, p[1])
     return this ? val.toCSS() : val
   }
 }
 
-var Value = function(val) {
+// convert string into LESS Object
+// current working type: Dimension, Color
+var lessObj = function(val) {
+  // it's has to be string type to get LESS Object
+  val += ''
+
   if(val.charAt(0)=='#') return new Color(val.slice(1))
+
+  var match = val.match(/^rgba?\((.*)\)/)
+  if(match) {
+    var alpha=1, rgba = match[1].split(',')
+    var rgb = rgba.length>3 ? (alpha=rgba.pop(), rgba) : rgba
+    return new Color(rgb, alpha)
+  }
 
   var match = val.match(/^([0-9.]+)([a-z%]*)/i)
   if(match) return new Dimension(match[1], match[2])
@@ -442,52 +463,57 @@ var Value = function(val) {
 var Color = less.tree.Color
 var Dimension = less.tree.Dimension
 
-var $mixins = {
-  '.alert-variant': function ($1, $2, $3) {
-    var context = {
-      '@background': $1,
-      '@border': $2,
-      '@text-color': $3
-    }
-    var map = function(name) {
-      name = context[name]||name
-      console.log(111, name)
-      return name.charAt(0)=='@' ? getVar(name) : name
-    }
-    return {
-      backgroundColor: map('@background'),
-      borderColor: map('@border'),
-      color: map('@text-color'),
-      padding: map('@alert-padding'),
-      hr: {
-        color: 'red',
-        borderTopColor: 'darken(@border, 5%)'
-      },
-      '.alert-link': {
-        color: 'darken(@text-color, 10%)'
-      }
-    }
+function lessValuePlugin(option) {
+  return function(val,key,node,result) {
+    return typeof val=='string' && val.charAt(0)=='@' ? getVar(val)(val,node) : val
   }
+}
+
+function getMixin (obj) {
+  return function() {
+    var keys = obj.$vars ? Object.keys(obj.$vars) : ''
+    keys && [].slice.call(arguments).forEach(function(v, i) {
+      obj.$vars[keys[i]] = v
+    })
+    return obj
+  }
+}
+
+var $mixins = {
+  '.alert-variant': getMixin({
+    $vars: {
+      'background': '',
+      'border': '',
+      'text-color': ''
+    },
+    backgroundColor: '@background',
+    borderColor: '@border',
+    color: '@text-color',
+    hr: {
+      color: 'red',
+      borderTopColor: getFuncion('darken', '@border', '5%')
+    },
+    '.alert-link': {
+      color: getFuncion('darken', '@text-color', '10%')
+    }
+  })
 }
 
 
 var obj = {
   $vars: $vars,
 
-  // mixins
-
-
   '.alert': {
-    padding: getVar('@alert-padding'),
-    marginBottom: getVar('@line-height-computed'),
+    padding: '@alert-padding',
+    marginBottom: '@line-height-computed',
     border: '1px solid transparent',
-    borderRadius: getVar('@alert-border-radius'),
+    borderRadius: '@alert-border-radius',
     h4: {
       marginTop: 0,
       color: 'inherit'
     },
     '.alert-link': {
-      fontWeight: getVar('@alert-link-font-weight')
+      fontWeight: '@alert-link-font-weight'
     },
     '> p,   > ul': {
       marginBottom: 0
@@ -505,67 +531,27 @@ var obj = {
       color: 'inherit'
     }
   },
-  '.alert-success': {
-    '.alert-variant(@alert-success-bg; @alert-success-border; @alert-success-text)': {}
-  },
-  '.alert-info': {
-    '.alert-variant(@alert-info-bg; @alert-info-border; @alert-info-text)': {}
-  },
-  '.alert-warning': {
-    '.alert-variant(@alert-warning-bg; @alert-warning-border; @alert-warning-text)': {}
-  },
-  '.alert-danger': Object.assign({
-    $vars:{
-      'close-color': '#888'
-    }
-    // '.alert-variant(@alert-danger-bg; @alert-danger-border; @alert-danger-text)': {}
-  }, $mixins['.alert-variant']('#fff', '@close-color', '#333'))
+  '.alert-success': Object.assign({},
+    $mixins['.alert-variant']('@alert-success-bg', '@alert-success-border', '@alert-success-text')
+  ),
+  '.alert-info': Object.assign({},
+    $mixins['.alert-variant']('@alert-info-bg', '@alert-info-border', '@alert-info-text')
+  ),
+  '.alert-warning': Object.assign({},
+    $mixins['.alert-variant']('@alert-warning-bg', '@alert-warning-border', '@alert-warning-text')
+  ),
+  '.alert-danger': Object.assign({},
+    $mixins['.alert-variant']('@alert-danger-bg', '@alert-danger-border', '@alert-danger-text')
+  )
 }
 
-function mixins(name, params) {
-  return function(prev, node) {
-    Object.keys(obj).forEach(function(v) {
-      node.prop[v] = [obj[v]]
-    })
+var result = cssobj(obj, {
+  onUpdate: cssobj_plugin_post_csstext(function(v) {
+    console.log(v)
+  }),
+  plugins:{
+    value: lessValuePlugin()
   }
-}
-
-
-// See below issue:
-// https://github.com/less/less.js/issues/2758
-// https://github.com/less/less.js/issues/2597
-
-// http://stackoverflow.com/questions/20336086/how-to-extract-less-js-parser-results-as-object-instead-compiled-css-with-tocss
-// To get a LESS syntax tree, use Parser
-// Parser(context:{}, imports:{ contents: {filename:'str'} }, rootFileInfo: {relativeUrls:true, rootpath: "/", filename: 'main.less'})
-var ppp, parser = new(less.Parser)({}, {contents: {}}, {})
-parser.parse('@a:2px; @b:#333; x {y: (2px + 1)}', function (e, tree) {
-  console.log(tree)
-  // ppp = tree.rules[0].rules[0].value.value[0].value[0]
 })
 
-// To get LESS css result, use render
-// input, options, cb
-less.render('x {y: (2px + 1)}', {}, function (err, root) {
- console.log(err, root)
-})
-
-
-
-// To get LESS css result, use render
-// input, options, cb
-less.parse('x {y: (2px + 1 - 10px)}', {}, function (err, root, imports, options) {
-  var p = new less.ParseTree(root, imports)
-  console.log(err, root, p, options)
-})
-
-
-// Calc 2 demension by op
-var d1 = new less.tree.Dimension(2, 'px')
-var d2 = new less.tree.Dimension(3, 'cm')
-
-console.log( d1.operate({}, '+', d2) )
-
-
-// Color op
-// (new less.tree.Color('fff')).toCSS()
+console.log(result)
