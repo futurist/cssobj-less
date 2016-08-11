@@ -3,10 +3,19 @@
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/call
 
 
+var _extend = require('objutil').extend
 var ColorNames = require('less/lib/less/data/colors')
 var Color = require('less/lib/less/tree/color')
 var Dimension = require('less/lib/less/tree/dimension')
 var Functions = require('less/lib/less/functions')()
+
+function mixin() {
+  var args = [].slice.call(arguments)
+  args.forEach(function(v) {
+    v.$vars = v.$vars || {}
+  })
+  return _extend.apply(null, args)
+}
 
 // invoke LESS Functions with param
 function getFuncion(name) {
@@ -95,6 +104,7 @@ function getMixin (obj) {
 }
 
 module.exports = {
+  mixin : mixin,
   getVar : getVar,
   getObj : getObj,
   getFuncion : getFuncion,

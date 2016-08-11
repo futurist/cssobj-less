@@ -2,13 +2,102 @@
 var lessHelper = require('./less-helper.js')
 
 var getVar =  lessHelper.getVar,
-  getObj =  lessHelper.getObj,
-  getFuncion =  lessHelper.getFuncion,
-  getMixin =  lessHelper.getMixin,
-  Operation =  lessHelper.Operation,
-  lessValuePlugin =  lessHelper.lessValuePlugin
+    getObj =  lessHelper.getObj,
+    getFuncion =  lessHelper.getFuncion,
+    getMixin =  lessHelper.getMixin,
+    Operation =  lessHelper.Operation,
+    mixin =  lessHelper.mixin,
+    lessValuePlugin =  lessHelper.lessValuePlugin
 
-var $vars = {
+var $vars = require('./bs-vars.js')
+
+var $mixins = {
+  '.alert-variant': getMixin({
+    $vars: {
+      'background': '',
+      'border': '',
+      'text-color': ''
+    },
+    backgroundColor: '@background',
+    borderColor: '@border',
+    color: '@text-color',
+    hr: {
+      color: 'red',
+      borderTopColor: getFuncion('darken', '@border', '5%')
+    },
+    '.alert-link': {
+      color: getFuncion('darken', '@text-color', '10%')
+    }
+  })
+}
+
+
+var obj = {
+  $vars: $vars,
+  '.alert': {
+    padding: '@alert-padding',
+    marginBottom: '@line-height-computed',
+    border: '1px solid transparent',
+    borderRadius: '@alert-border-radius',
+    h4: {
+      marginTop: 0,
+      color: 'inherit'
+    },
+    '.alert-link': {
+      fontWeight: '@alert-link-font-weight'
+    },
+    '> p,   > ul': {
+      marginBottom: 0
+    },
+    '> p + p': {
+      marginTop: '5px'
+    }
+  },
+  '.alert-dismissable,  .alert-dismissible': {
+    paddingRight: Operation('+', '@alert-padding', ['-', '@alert-padding', ['+', 5, 10]]),
+    '.close': {
+      position: 'relative',
+      top: '-2px',
+      right: '-21px',
+      color: 'inherit'
+    }
+  },
+  '.alert-success': mixin({},
+    $mixins['.alert-variant']('@alert-success-bg', '@alert-success-border', '@alert-success-text')
+  ),
+  '.alert-info': mixin({},
+    $mixins['.alert-variant']('@alert-info-bg', '@alert-info-border', '@alert-info-text')
+  ),
+  '.alert-warning': mixin({},
+    $mixins['.alert-variant']('@alert-warning-bg', '@alert-warning-border', '@alert-warning-text')
+  ),
+  '.alert-danger': mixin({},
+    $mixins['.alert-variant']('@alert-danger-bg', '@alert-danger-border', '@alert-danger-text')
+  )
+}
+
+var result = cssobj(obj, {
+  onUpdate: cssobj_plugin_post_csstext(function(v) {
+    console.log(v)
+  }),
+  plugins:{
+    value: lessValuePlugin()
+  }
+})
+
+console.log(result)
+
+},{"./bs-vars.js":2,"./less-helper.js":3}],2:[function(require,module,exports){
+// all bootstrap vars
+var lessHelper = require('./less-helper.js')
+
+var getVar =  lessHelper.getVar,
+    getObj =  lessHelper.getObj,
+    getFuncion =  lessHelper.getFuncion,
+    getMixin =  lessHelper.getMixin,
+    Operation =  lessHelper.Operation
+
+module.exports = {
   'gray-base': '#000',
   'gray-darker': 'lighten(@gray-base, 13.5%)',
   'gray-dark': 'lighten(@gray-base, 20%)',
@@ -398,92 +487,25 @@ var $vars = {
   'hr-border': '@gray-lighter'
 }
 
-var $mixins = {
-  '.alert-variant': getMixin({
-    $vars: {
-      'background': '',
-      'border': '',
-      'text-color': ''
-    },
-    backgroundColor: '@background',
-    borderColor: '@border',
-    color: '@text-color',
-    hr: {
-      color: 'red',
-      borderTopColor: getFuncion('darken', '@border', '5%')
-    },
-    '.alert-link': {
-      color: getFuncion('darken', '@text-color', '10%')
-    }
-  })
-}
-
-
-var obj = {
-  $vars: $vars,
-  '.alert': {
-    padding: '@alert-padding',
-    marginBottom: '@line-height-computed',
-    border: '1px solid transparent',
-    borderRadius: '@alert-border-radius',
-    h4: {
-      marginTop: 0,
-      color: 'inherit'
-    },
-    '.alert-link': {
-      fontWeight: '@alert-link-font-weight'
-    },
-    '> p,   > ul': {
-      marginBottom: 0
-    },
-    '> p + p': {
-      marginTop: '5px'
-    }
-  },
-  '.alert-dismissable,  .alert-dismissible': {
-    paddingRight: Operation('+', '@alert-padding', ['-', '@alert-padding', ['+', 5, 10]]),
-    '.close': {
-      position: 'relative',
-      top: '-2px',
-      right: '-21px',
-      color: 'inherit'
-    }
-  },
-  '.alert-success': Object.assign({},
-    $mixins['.alert-variant']('@alert-success-bg', '@alert-success-border', '@alert-success-text')
-  ),
-  '.alert-info': Object.assign({},
-    $mixins['.alert-variant']('@alert-info-bg', '@alert-info-border', '@alert-info-text')
-  ),
-  '.alert-warning': Object.assign({},
-    $mixins['.alert-variant']('@alert-warning-bg', '@alert-warning-border', '@alert-warning-text')
-  ),
-  '.alert-danger': Object.assign({},
-    $mixins['.alert-variant']('@alert-danger-bg', '@alert-danger-border', '@alert-danger-text')
-  )
-}
-
-var result = cssobj(obj, {
-  onUpdate: cssobj_plugin_post_csstext(function(v) {
-    console.log(v)
-  }),
-  plugins:{
-    value: lessValuePlugin()
-  }
-})
-
-console.log(result)
-
-},{"./less-helper.js":2}],2:[function(require,module,exports){
+},{"./less-helper.js":3}],3:[function(require,module,exports){
 'use strict'
 // use strict-mode to get func.call work with right this
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/call
 
 
+var _extend = require('objutil').extend
 var ColorNames = require('less/lib/less/data/colors')
 var Color = require('less/lib/less/tree/color')
 var Dimension = require('less/lib/less/tree/dimension')
 var Functions = require('less/lib/less/functions')()
+
+function mixin() {
+  var args = [].slice.call(arguments)
+  args.forEach(function(v) {
+    v.$vars = v.$vars || {}
+  })
+  return _extend.apply(null, args)
+}
 
 // invoke LESS Functions with param
 function getFuncion(name) {
@@ -572,6 +594,7 @@ function getMixin (obj) {
 }
 
 module.exports = {
+  mixin : mixin,
   getVar : getVar,
   getObj : getObj,
   getFuncion : getFuncion,
@@ -580,7 +603,7 @@ module.exports = {
   lessValuePlugin : lessValuePlugin,
 }
 
-},{"less/lib/less/data/colors":4,"less/lib/less/functions":12,"less/lib/less/tree/color":21,"less/lib/less/tree/dimension":25}],3:[function(require,module,exports){
+},{"less/lib/less/data/colors":5,"less/lib/less/functions":13,"less/lib/less/tree/color":22,"less/lib/less/tree/dimension":26,"objutil":38}],4:[function(require,module,exports){
 var contexts = {};
 module.exports = contexts;
 
@@ -693,7 +716,7 @@ contexts.Eval.prototype.normalizePath = function( path ) {
 
 //todo - do the same for the toCSS ?
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 module.exports = {
     'aliceblue':'#f0f8ff',
     'antiquewhite':'#faebd7',
@@ -844,7 +867,7 @@ module.exports = {
     'yellow':'#ffff00',
     'yellowgreen':'#9acd32'
 };
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 module.exports = {
     length: {
         'm': 1,
@@ -866,7 +889,7 @@ module.exports = {
         'turn': 1
     }
 };
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 var Color = require("../tree/color"),
     functionRegistry = require("./function-registry");
 
@@ -942,7 +965,7 @@ for (var f in colorBlendModeFunctions) {
 
 functionRegistry.addMultiple(colorBlend);
 
-},{"../tree/color":21,"./function-registry":11}],7:[function(require,module,exports){
+},{"../tree/color":22,"./function-registry":12}],8:[function(require,module,exports){
 var Dimension = require("../tree/dimension"),
     Color = require("../tree/color"),
     Quoted = require("../tree/quoted"),
@@ -1274,7 +1297,7 @@ colorFunctions = {
 };
 functionRegistry.addMultiple(colorFunctions);
 
-},{"../tree/anonymous":20,"../tree/color":21,"../tree/dimension":25,"../tree/quoted":33,"./function-registry":11}],8:[function(require,module,exports){
+},{"../tree/anonymous":21,"../tree/color":22,"../tree/dimension":26,"../tree/quoted":34,"./function-registry":12}],9:[function(require,module,exports){
 module.exports = function(environment) {
     var Quoted = require("../tree/quoted"),
         URL = require("../tree/url"),
@@ -1361,7 +1384,7 @@ module.exports = function(environment) {
     });
 };
 
-},{"../logger":19,"../tree/quoted":33,"../tree/url":35,"./function-registry":11}],9:[function(require,module,exports){
+},{"../logger":20,"../tree/quoted":34,"../tree/url":36,"./function-registry":12}],10:[function(require,module,exports){
 var Keyword = require("../tree/keyword"),
     functionRegistry = require("./function-registry");
 
@@ -1390,7 +1413,7 @@ functionRegistry.add("default", defaultFunc.eval.bind(defaultFunc));
 
 module.exports = defaultFunc;
 
-},{"../tree/keyword":29,"./function-registry":11}],10:[function(require,module,exports){
+},{"../tree/keyword":30,"./function-registry":12}],11:[function(require,module,exports){
 var Expression = require("../tree/expression");
 
 var functionCaller = function(name, context, index, currentFileInfo) {
@@ -1438,7 +1461,7 @@ functionCaller.prototype.call = function(args) {
 
 module.exports = functionCaller;
 
-},{"../tree/expression":26}],11:[function(require,module,exports){
+},{"../tree/expression":27}],12:[function(require,module,exports){
 function makeRegistry( base ) {
     return {
         _data: {},
@@ -1468,7 +1491,7 @@ function makeRegistry( base ) {
 }
 
 module.exports = makeRegistry( null );
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 module.exports = function(environment) {
     var functions = {
         functionRegistry: require("./function-registry"),
@@ -1489,7 +1512,7 @@ module.exports = function(environment) {
     return functions;
 };
 
-},{"./color":7,"./color-blending":6,"./data-uri":8,"./default":9,"./function-caller":10,"./function-registry":11,"./math":14,"./number":15,"./string":16,"./svg":17,"./types":18}],13:[function(require,module,exports){
+},{"./color":8,"./color-blending":7,"./data-uri":9,"./default":10,"./function-caller":11,"./function-registry":12,"./math":15,"./number":16,"./string":17,"./svg":18,"./types":19}],14:[function(require,module,exports){
 var Dimension = require("../tree/dimension");
 
 var MathHelper = function() {
@@ -1506,7 +1529,7 @@ MathHelper._math = function (fn, unit, n) {
     return new Dimension(fn(parseFloat(n.value)), unit);
 };
 module.exports = MathHelper;
-},{"../tree/dimension":25}],14:[function(require,module,exports){
+},{"../tree/dimension":26}],15:[function(require,module,exports){
 var functionRegistry = require("./function-registry"),
     mathHelper = require("./math-helper.js");
 
@@ -1537,7 +1560,7 @@ mathFunctions.round = function (n, f) {
 
 functionRegistry.addMultiple(mathFunctions);
 
-},{"./function-registry":11,"./math-helper.js":13}],15:[function(require,module,exports){
+},{"./function-registry":12,"./math-helper.js":14}],16:[function(require,module,exports){
 var Dimension = require("../tree/dimension"),
     Anonymous = require("../tree/anonymous"),
     functionRegistry = require("./function-registry"),
@@ -1620,7 +1643,7 @@ functionRegistry.addMultiple({
     }
 });
 
-},{"../tree/anonymous":20,"../tree/dimension":25,"./function-registry":11,"./math-helper.js":13}],16:[function(require,module,exports){
+},{"../tree/anonymous":21,"../tree/dimension":26,"./function-registry":12,"./math-helper.js":14}],17:[function(require,module,exports){
 var Quoted = require("../tree/quoted"),
     Anonymous = require("../tree/anonymous"),
     JavaScript = require("../tree/javascript"),
@@ -1659,7 +1682,7 @@ functionRegistry.addMultiple({
     }
 });
 
-},{"../tree/anonymous":20,"../tree/javascript":27,"../tree/quoted":33,"./function-registry":11}],17:[function(require,module,exports){
+},{"../tree/anonymous":21,"../tree/javascript":28,"../tree/quoted":34,"./function-registry":12}],18:[function(require,module,exports){
 module.exports = function(environment) {
     var Dimension = require("../tree/dimension"),
         Color = require("../tree/color"),
@@ -1749,7 +1772,7 @@ module.exports = function(environment) {
     });
 };
 
-},{"../tree/color":21,"../tree/dimension":25,"../tree/expression":26,"../tree/quoted":33,"../tree/url":35,"./function-registry":11}],18:[function(require,module,exports){
+},{"../tree/color":22,"../tree/dimension":26,"../tree/expression":27,"../tree/quoted":34,"../tree/url":36,"./function-registry":12}],19:[function(require,module,exports){
 var Keyword = require("../tree/keyword"),
     DetachedRuleset = require("../tree/detached-ruleset"),
     Dimension = require("../tree/dimension"),
@@ -1840,7 +1863,7 @@ functionRegistry.addMultiple({
     }
 });
 
-},{"../tree/anonymous":20,"../tree/color":21,"../tree/detached-ruleset":24,"../tree/dimension":25,"../tree/keyword":29,"../tree/operation":31,"../tree/quoted":33,"../tree/url":35,"./function-registry":11}],19:[function(require,module,exports){
+},{"../tree/anonymous":21,"../tree/color":22,"../tree/detached-ruleset":25,"../tree/dimension":26,"../tree/keyword":30,"../tree/operation":32,"../tree/quoted":34,"../tree/url":36,"./function-registry":12}],20:[function(require,module,exports){
 module.exports = {
     error: function(msg) {
         this._fireEvent("error", msg);
@@ -1876,7 +1899,7 @@ module.exports = {
     _listeners: []
 };
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 var Node = require("./node");
 
 var Anonymous = function (value, index, currentFileInfo, mapLines, rulesetLike, visibilityInfo) {
@@ -1904,7 +1927,7 @@ Anonymous.prototype.genCSS = function (context, output) {
 };
 module.exports = Anonymous;
 
-},{"./node":30}],21:[function(require,module,exports){
+},{"./node":31}],22:[function(require,module,exports){
 var Node = require("./node"),
     colors = require("../data/colors");
 
@@ -2095,7 +2118,7 @@ Color.fromKeyword = function(keyword) {
 };
 module.exports = Color;
 
-},{"../data/colors":4,"./node":30}],22:[function(require,module,exports){
+},{"../data/colors":5,"./node":31}],23:[function(require,module,exports){
 var Node = require("./node"),
     getDebugInfo = require("./debug-info");
 
@@ -2119,7 +2142,7 @@ Comment.prototype.isSilent = function(context) {
 };
 module.exports = Comment;
 
-},{"./debug-info":23,"./node":30}],23:[function(require,module,exports){
+},{"./debug-info":24,"./node":31}],24:[function(require,module,exports){
 var debugInfo = function(context, ctx, lineSeparator) {
     var result = "";
     if (context.dumpLineNumbers && !context.compress) {
@@ -2159,7 +2182,7 @@ debugInfo.asMediaQuery = function(ctx) {
 
 module.exports = debugInfo;
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 var Node = require("./node"),
     contexts = require("../contexts");
 
@@ -2182,7 +2205,7 @@ DetachedRuleset.prototype.callEval = function (context) {
 };
 module.exports = DetachedRuleset;
 
-},{"../contexts":3,"./node":30}],25:[function(require,module,exports){
+},{"../contexts":4,"./node":31}],26:[function(require,module,exports){
 var Node = require("./node"),
     unitConversions = require("../data/unit-conversions"),
     Unit = require("./unit"),
@@ -2341,7 +2364,7 @@ Dimension.prototype.convertTo = function (conversions) {
 };
 module.exports = Dimension;
 
-},{"../data/unit-conversions":5,"./color":21,"./node":30,"./unit":34}],26:[function(require,module,exports){
+},{"../data/unit-conversions":6,"./color":22,"./node":31,"./unit":35}],27:[function(require,module,exports){
 var Node = require("./node"),
     Paren = require("./paren"),
     Comment = require("./comment");
@@ -2399,7 +2422,7 @@ Expression.prototype.throwAwayComments = function () {
 };
 module.exports = Expression;
 
-},{"./comment":22,"./node":30,"./paren":32}],27:[function(require,module,exports){
+},{"./comment":23,"./node":31,"./paren":33}],28:[function(require,module,exports){
 var JsEvalNode = require("./js-eval-node"),
     Dimension = require("./dimension"),
     Quoted = require("./quoted"),
@@ -2429,7 +2452,7 @@ JavaScript.prototype.eval = function(context) {
 
 module.exports = JavaScript;
 
-},{"./anonymous":20,"./dimension":25,"./js-eval-node":28,"./quoted":33}],28:[function(require,module,exports){
+},{"./anonymous":21,"./dimension":26,"./js-eval-node":29,"./quoted":34}],29:[function(require,module,exports){
 var Node = require("./node"),
     Variable = require("./variable");
 
@@ -2492,7 +2515,7 @@ JsEvalNode.prototype.jsify = function (obj) {
 
 module.exports = JsEvalNode;
 
-},{"./node":30,"./variable":36}],29:[function(require,module,exports){
+},{"./node":31,"./variable":37}],30:[function(require,module,exports){
 var Node = require("./node");
 
 var Keyword = function (value) { this.value = value; };
@@ -2508,7 +2531,7 @@ Keyword.False = new Keyword('false');
 
 module.exports = Keyword;
 
-},{"./node":30}],30:[function(require,module,exports){
+},{"./node":31}],31:[function(require,module,exports){
 var Node = function() {
 };
 Node.prototype.toCSS = function (context) {
@@ -2633,7 +2656,7 @@ Node.prototype.copyVisibilityInfo = function(info) {
 };
 module.exports = Node;
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 var Node = require("./node"),
     Color = require("./color"),
     Dimension = require("./dimension");
@@ -2683,7 +2706,7 @@ Operation.prototype.genCSS = function (context, output) {
 
 module.exports = Operation;
 
-},{"./color":21,"./dimension":25,"./node":30}],32:[function(require,module,exports){
+},{"./color":22,"./dimension":26,"./node":31}],33:[function(require,module,exports){
 var Node = require("./node");
 
 var Paren = function (node) {
@@ -2701,7 +2724,7 @@ Paren.prototype.eval = function (context) {
 };
 module.exports = Paren;
 
-},{"./node":30}],33:[function(require,module,exports){
+},{"./node":31}],34:[function(require,module,exports){
 var Node = require("./node"),
     JsEvalNode = require("./js-eval-node"),
     Variable = require("./variable");
@@ -2758,7 +2781,7 @@ Quoted.prototype.compare = function (other) {
 };
 module.exports = Quoted;
 
-},{"./js-eval-node":28,"./node":30,"./variable":36}],34:[function(require,module,exports){
+},{"./js-eval-node":29,"./node":31,"./variable":37}],35:[function(require,module,exports){
 var Node = require("./node"),
     unitConversions = require("../data/unit-conversions");
 
@@ -2880,7 +2903,7 @@ Unit.prototype.cancel = function () {
 };
 module.exports = Unit;
 
-},{"../data/unit-conversions":5,"./node":30}],35:[function(require,module,exports){
+},{"../data/unit-conversions":6,"./node":31}],36:[function(require,module,exports){
 var Node = require("./node");
 
 var URL = function (val, index, currentFileInfo, isEvald) {
@@ -2936,7 +2959,7 @@ URL.prototype.eval = function (context) {
 };
 module.exports = URL;
 
-},{"./node":30}],36:[function(require,module,exports){
+},{"./node":31}],37:[function(require,module,exports){
 var Node = require("./node");
 
 var Variable = function (name, index, currentFileInfo) {
@@ -2991,4 +3014,106 @@ Variable.prototype.find = function (obj, fun) {
 };
 module.exports = Variable;
 
-},{"./node":30}]},{},[1]);
+},{"./node":31}],38:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+// better type check
+var is = function (t, v) { return {}.toString.call(v).slice(8, -1) === t }
+var own = function (o, k) { return {}.hasOwnProperty.call(o, k) }
+
+function isIterable (v) {
+  return is('Object', v) || is('Array', v) || is('Map', v)
+}
+
+function isPrimitive (val) {
+  return !/obj|func/.test(typeof val) || !val
+}
+
+function deepIt (a, b, callback, path) {
+  path = path || []
+  if (isPrimitive(b)) return a
+  for ( var key in b) {
+    if (!own(b, key)) continue
+    callback(a, b, key, path, key in a)
+    if (isIterable(b[key]) && isIterable(a[key])) {
+      deepIt(a[key], b[key], callback, path.concat(key))
+    }
+  }
+  return a
+}
+
+function get(obj, p, errNotFound) {
+  var n = obj
+  for(var i = 0, len = p.length; i < len; i++) {
+    if(!isIterable(n) || !(p[i] in n))
+      return errNotFound ? new Error('NotFound') : undefined
+    n = n[p[i]]
+  }
+  return n
+}
+
+function extend () {
+  var arg = arguments, last
+  for(var i=arg.length; i--;) {
+    last = deepIt(arg[i], last, function (a, b, key, path, inA) {
+      if(!inA || isPrimitive(b[key])) a[key] = b[key]
+    })
+  }
+  return last
+}
+
+/** Usage: _exlucde(obj, {x:{y:2, z:3} } ) will delete x.y,x.z on obj
+ *  when isSet, will set value to a instead of delete
+ */
+// _exclude( {a:1,b:{d:{ c:2} } }, { b:{d:{ c:1} } } )
+function exclude (x, y, isSet) {
+  return deepIt(x, y, function (a, b, key) {
+    if (isPrimitive(b[key])) {
+      isSet
+        ? (key in a ? a[key] = b[key] : '')
+      : (b[key] ? delete a[key] : '')
+    }
+  })
+}
+
+function pick(obj, props) {
+  var o={}
+  return deepIt(o, props, function(a,b,key,path){
+    var c = get(obj,path.concat(key))
+    if(!b[key]) return
+    if(!isPrimitive(c)) a[key] = is('Array', c) ? [] : {}
+    if(isPrimitive(b[key])) a[key] = c
+  })
+}
+
+function pick2(obj, props) {
+  props=props||{}
+  var o={}
+  return deepIt(o, obj, function(a,b,key,path){
+    var c = get(props,path.concat(key))
+    if(c && isPrimitive(c)) return
+    if(!isPrimitive(b[key])) a[key] = is('Array', b[key]) ? [] : {}
+    else a[key]= b[key]
+  })
+}
+
+function defaults(obj, option) {
+  return deepIt(obj, option, function(a,b,key){
+    if(!(key in a)) a[key]=b[key]
+  })
+}
+
+exports.is = is;
+exports.own = own;
+exports.isIterable = isIterable;
+exports.isPrimitive = isPrimitive;
+exports.deepIt = deepIt;
+exports.get = get;
+exports.extend = extend;
+exports.exclude = exclude;
+exports.pick = pick;
+exports.pick2 = pick2;
+exports.defaults = defaults;
+},{}]},{},[1]);
