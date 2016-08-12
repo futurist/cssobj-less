@@ -85,7 +85,7 @@ window.onload = function() {
 }
 
 
-var str = 'ceil((@font-size-base * 1.7))'
+var str = 'ceil((@font-size-base * -1.7))'
 
 
 function splitComma (str, comma) {
@@ -121,7 +121,7 @@ function parseStr(val, paramN) {
   }
 
   // dimension 10px
-  var match = val.match(/^([0-9.-]+)([a-z%]*)(.*)$/i)
+  var match = val.match(/^\s*([0-9.-]+)([a-z%]*)(.*)\s*$/i)
   if(match) return prefix + match[1] + (match[2]||'') + parseStr(match[3]) // new Dimension(match[1], match[2])
 
   // ceil()
@@ -136,16 +136,16 @@ function parseStr(val, paramN) {
     return prefix + 'Operation(' + parseStr(match[1], 0)
   }
 
-  // +-*/
-  var match = val.match(/^\s*([\+\-\*\/])(.*)\s*$/)
-  if (match) {
-    return prefix + '"-'+match[1]+'-"' + parseStr(match[2])
-  }
-
   // @var
   var match = val.match(/^\s*(@[a-z0-9$-]+)(.*)\s*$/i)
   if(match) {
     return prefix + 'getVar("'+match[1]+'")' + parseStr(match[2])
+  }
+
+  // +-*/
+  var match = val.match(/^\s*([\+\-\*\/])(.*)\s*$/)
+  if (match) {
+    return prefix + '"##'+match[1]+'##"' + parseStr(match[2])
   }
 
   if(/^[\s)]*$/.test(val)) return val
