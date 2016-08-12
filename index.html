@@ -16,11 +16,25 @@
 
     <script type="text/javascript" src="./node_modules/cssobj/dist/cssobj.iife.js"></script>
     <script type="text/javascript" src="./node_modules/cssobj-plugin-post-csstext/dist/cssobj-plugin-post-csstext.iife.js"></script>
+    <script type="text/javascript" src="./build.js"></script>
   </head>
   <body>
     <h1>Hello, Bootstrap in JS!</h1>
-    <div class="bs-example" id="container">
+    <em>(Open Console to see the Result)</em>
+    <hr>
+    <div id="control">
+      <div><input disabled value="@font-size-base">: <input type="range" min="10" max="30" id="font-size-base" data-unit="px"><span id="val0"></span></div>
+      <div><input disabled value="@border-radius-base">: <input type="range" min="0" max="10" id="border-radius-base" data-unit="px"><span id="val1"></span></div>
+      <div><input disabled value="@alert-padding">: <input type="range" min="10" max="50" id="alert-padding" data-unit="px"><span id="val2"></span></div>
+      <div><input disabled value="@state-success-bg">: <input type="color" id="state-success-bg"><span id="val3"></span></div>
+      <div><input disabled value="@state-success-text">: <input type="color" id="state-success-text"><span id="val4"></span></div>
     </div>
-    <script type="text/javascript" src="./build.js"></script>
+    <hr>
+    <div class="bs-example" id="container">
+      <div class="my-prefix-alert my-prefix-alert-success" role="alert"><strong>Well done!</strong> You successfully read this important alert message. </div>
+      <div class="my-prefix-alert my-prefix-alert-info" role="alert"> <strong>Heads up!</strong> This alert needs your attention, but it's not super important. </div>
+      <div class="my-prefix-alert my-prefix-alert-warning" role="alert"> <strong>Warning!</strong> Better check yourself, you're not looking too good. </div>
+      <div class="my-prefix-alert my-prefix-alert-danger" role="alert"> <strong>Oh snap!</strong> Change a few things up and try submitting again. </div>
+    </div>
   </body>
 </html>

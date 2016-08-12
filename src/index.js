@@ -1,66 +1,85 @@
 
-import {extend} from 'objutil'
-import * as normalize from './normalize.js'
-import * as scaffolding from './scaffolding.js'
-import * as alert from './alert.js'
-import {lessValuePlugin} from './less-helper.js'
+var extend = require('objutil').extend
+var normalize = require('./normalize.js')
+var scaffolding = require('./scaffolding.js')
+var alert = require('./alert.js')
+var $vars = require('./bs-vars.js')
+var lessHelper = require('./less-helper.js')
+
+// extend will overwrite normalize rule
+// make it seperate cssobj first
+cssobj(normalize)
 
 var obj = extend(
-  {},
+  //css for page
+  {
+    'body ': {
+      padding: '10px'
+    },
+    '#control': {
+      marginBottom: '20px',
+      span:{
+        paddingLeft: '10px'
+      }
+    },
+    input: {
+      width: '100px'
+    },
+    'input[disabled]':{
+      width: '140px',
+      border:'none'
+    }
+  },
+  //css from bootstrap
   scaffolding,
   alert
 )
 
-// bs extend will overwrite normalize, so seperate it
-cssobj(normalize)
-
-// var result = cssobj(obj, {
-//   onUpdate: cssobj_plugin_post_csstext(function(v) {
-//     console.log(v)
-//   }),
-//   plugins:{
-//     value: lessValuePlugin()
-//   }
-// })
-
-// console.log(result)
-
-
-import React from 'react'
-import ReactDOM from 'react-dom'
-
-class App extends React.Component {
-  constructor (props) {
-    super(props)
-
-    this.state = {
-      obj: obj,
-      result: cssobj(obj, {local: props.local, onUpdate:cssobj_plugin_post_csstext(function(v) {
-        console.log(v)
-      }), plugins:{
-        value: lessValuePlugin()
-      } })
-    }
-    this.updateCSS = this.updateCSS.bind(this)
+var result = cssobj(obj, {
+  local:{prefix:'my-prefix-'},
+  onUpdate: cssobj_plugin_post_csstext(function(v) {
+    console.log(v)
+  }),
+  plugins:{
+    value: lessHelper.lessValuePlugin()
   }
+})
 
-  updateCSS () {
-    this.state.obj['.nav'].fontSize = '34px'
-    this.state.result.update()
-  }
+console.log(result)
 
-  render () {
-    var result = this.state.result
-    return (
-      <div className="alert-wrapper">
-        <div className={result.mapClass("alert alert-danger")} role="alert"><strong>Well done!</strong> You successfully read this important alert message. </div>
-        <div className={result.mapClass("alert alert-danger")} role="alert"> <strong>Heads up!</strong> This alert needs your attention, but it's not super important. </div>
-      <div className={result.mapClass("alert alert-danger")} role="alert"> <strong>Warning!</strong> Better check yourself, you're not looking too good. </div>
-        <div className={result.mapClass("alert alert-danger")} role="alert"> <strong>Oh snap!</strong> Change a few things up and try submitting again. </div>
-      </div>
-    )
-  }
+
+var $ = function(sel) {
+  return document.getElementById(sel)
 }
 
-ReactDOM.render(<App local={true} />, document.getElementById('container'))
+// console.log($vars['font-size-base'])
+// console.log($vars['alert-padding'])
+// console.log($vars['border-radius-base'])
+// console.log($vars['state-success-bg'])
+// console.log($vars['state-success-text'])
 
+var inter, TIME=60
+function updateCSS() {
+  clearTimeout(inter)
+  inter = setTimeout(function() {
+    result.update()
+  }, TIME)
+}
+
+window.onload = function() {
+  ![
+    'font-size-base',
+    'border-radius-base',
+    'alert-padding',
+    'state-success-bg',
+    'state-success-text'
+  ].forEach(function(v, i) {
+    var val = $vars[v]
+    $(v).value = val.charAt(0)=='#' ? val: parseInt(val)
+    $(v).onchange = function() {
+      $('val'+i).innerHTML = $vars[v] = this.value + (this.getAttribute('data-unit')||'')
+      updateCSS()
+    }
+    $(v).onchange()
+  })
+}

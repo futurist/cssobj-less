@@ -53,7 +53,7 @@ var obj = {
     }
   },
   '.alert-dismissable,  .alert-dismissible': {
-    paddingRight: Operation('+', '@alert-padding', ['-', '@alert-padding', ['+', 5, 10]]),
+    paddingRight: Operation('+', '@alert-padding', 20),
     '.close': {
       position: 'relative',
       top: '-2px',

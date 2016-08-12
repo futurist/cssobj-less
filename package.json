@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "make": "browserify src/index.js -o build.js",
+    "watch": "watchify src/index.js -o build.js",
     "bump": "gulp bump"
   },
   "keywords": [
@@ -15,15 +16,8 @@
   ],
   "author": "James Yang <jamesyang999@gmail.com>",
   "license": "MIT",
-  "browserify":{
-    "transform": [["babelify", {"presets": ["react", "es2015"]}]]
-  },
   "devDependencies": {
-    "babel-preset-es2015": "^6.13.2",
-    "babel-preset-react": "^6.11.1",
-    "babelify": "^7.3.0"
   },
   "dependencies": {
-    "react": "^15.3.0"
   }
 }
