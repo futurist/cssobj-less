@@ -13,8 +13,11 @@ cssobj(normalize)
 var obj = extend(
   //css for page
   {
+    $vars:{
+      'padding': '112px'
+    },
     'body ': {
-      padding: '10px'
+      padding: parseExpression('(@padding - 100)')
     },
     '#control': {
       marginBottom: '20px',
@@ -85,24 +88,25 @@ window.onload = function() {
   })
 }
 
+function parseExpression(str) {
+  // var str = 'ceil((@font-size-base * -1.7))'
+  // str = '(ceil((8.2 - 3)) + (3 + 2))'
 
-var str = 'ceil((@font-size-base * -1.7))'
+  var arr = []
+  parseStr(str, arr)
+  // console.log( 3333, arr[0], applyArr(arr[0]) )
+  return applyArr(arr[0])
+}
 
-str = '(ceil((8.2 - 3)) + (3 + 2))'
-
-var arr = []
-
-parseStr('darken(#fff, 30%)', arr)
+console.log( parseExpression('--zfff + 333') )
 
 function applyArr(arr) {
-  return typeof arr[0]=='function'
+  return Array.isArray(arr)
     ? arr[0].apply(null, arr.slice(1).map(function(v) {
       return Array.isArray(v) ? applyArr(v) : v
     }))
-  : arr[0]
+  : arr
 }
-
-console.log( 3333, arr[0], applyArr(arr[0])() )
 
 function parseStr(val, callArr) {
   var ret
@@ -115,7 +119,7 @@ function parseStr(val, callArr) {
   var match = val.match(/^\s*(rgba?\([^)]*\))(.*)$/i)  //rgba
       || val.match(/^\s*(#[0-9A-F]+)(.*)$/i)  //#333
       || val.match(/^\s*(@[a-z0-9$-]+)(.*)\s*$/i) //@var-name
-      || val.match(/^\s*([0-9.-]+[a-z%]*)(.*)\s*$/i)  //-10px
+      || val.match(/^\s*([0-9.-]+[a-f%]*)(.*)\s*$/i)  //-10px
       || val.match(/^\s*([\+\-\*\/])(.*)\s*$/)  // +-*/
   if(match) {
     callArr.push(match[1])
