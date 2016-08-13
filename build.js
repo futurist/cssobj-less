@@ -3021,18 +3021,19 @@ var obj = extend(
     },
     'input[disabled]':{
       width: '140px',
-      border:'none'
+      border:'none',
+      background:'none'
     }
-  },
+  }
   //css from bootstrap
-  scaffolding,
-  alert
+  // scaffolding,
+  // alert
 )
 
 var result = cssobj(obj, {
   local:{prefix:'my-prefix-'},
   onUpdate: cssobj_plugin_post_csstext(function(v) {
-    console.log(v)
+    // console.log(v)
   }),
   plugins:{
     value: lessHelper.lessValuePlugin()
@@ -3081,94 +3082,81 @@ window.onload = function() {
 
 var str = 'ceil((@font-size-base * -1.7))'
 
+str = '(ceil((8.2 - 3)) + (3 + 2))'
 
-function splitComma (str, comma) {
-  var sep = []
-  for (var c, i = 0, n = 0, prev = 0, d = []; c = str.charAt(i); i++) {
-    if (c == '(' || c == '[') n++
-    if (c == ')' || c == ']') n--
-    if (!n && comma.test(c)) d.push(str.substring(prev, i), c), prev = i + 1
-  }
-  return d.concat(str.substring(prev))
+var arr = []
+
+parseStr('darken(#fff, 30%)', arr)
+
+function applyArr(arr) {
+  return typeof arr[0]=='function'
+    ? arr[0].apply(null, arr.slice(1).map(function(v) {
+      return Array.isArray(v) ? applyArr(v) : v
+    }))
+  : arr[0]
 }
 
-console.log( 3333, parseStr(str) )
+console.log( 3333, arr[0], applyArr(arr[0])() )
 
-function parseStr(val, paramN) {
-  var rs = '', args, prefix=paramN > 0? ',' : ''
+function parseStr(val, callArr) {
+  var ret
 
   val += ''
 
+  val = lessHelper.ColorNames[val] || val
 
-  // val = ColorNames[val] || val
-
-  // color #333
-  var match = val.match(/^\s*#([0-9A-F]+)(.*)$/i)
-  if(match) return prefix + match[1] + parseStr(match[2]) //new Color(val.slice(1))
-
-  // color rgba()
-  var match = val.match(/^\s*rgba?\(([^)]*)\)(.*)$/i)
+  // color rgba(), #333, @var-name
+  var match = val.match(/^\s*(rgba?\([^)]*\))(.*)$/i)  //rgba
+      || val.match(/^\s*(#[0-9A-F]+)(.*)$/i)  //#333
+      || val.match(/^\s*(@[a-z0-9$-]+)(.*)\s*$/i) //@var-name
+      || val.match(/^\s*([0-9.-]+[a-z%]*)(.*)\s*$/i)  //-10px
+      || val.match(/^\s*([\+\-\*\/])(.*)\s*$/)  // +-*/
   if(match) {
-    var alpha=1, rgba = match[1].split(',')
-    var rgb = rgba.length>3 ? (alpha=rgba.pop(), rgba) : rgba
-    return prefix + match[1] + parseStr(match[2]) // new Color(rgb, alpha)
+    callArr.push(match[1])
+    return parseStr(match[2], callArr)
   }
-
-  // dimension 10px
-  var match = val.match(/^\s*([0-9.-]+)([a-z%]*)(.*)\s*$/i)
-  if(match) return prefix + match[1] + (match[2]||'') + parseStr(match[3]) // new Dimension(match[1], match[2])
 
   // ceil()
   var match = val.match(/^\s*([a-z]+)\((.*)\s*$/i)
-  if(match) {
-    return prefix + 'getFuncion("'+match[1]+ '"' + parseStr(match[2], 1)
+  if (match) {
+    var arr = [lessHelper.getFuncion, match[1]]
+    var rest = parseStr(match[2], arr)
+    // callArr.push(arr[0].apply(null, arr.slice(1)))
+    callArr.push(arr)
+    return parseStr(rest, callArr)
   }
 
-  // ceil()
+  // operate()
   var match = val.match(/^\s*\((.*)\s*$/i)
   if(match) {
-    return prefix + 'Operation(' + parseStr(match[1], 0)
+    var arr = [lessHelper.Operation]
+    var rest = parseStr(match[1], arr)
+    // callArr.push(arr[0].apply(null, arr.slice(1)))
+    callArr.push(arr)
+    return parseStr(rest, callArr)
   }
 
-  // @var
-  var match = val.match(/^\s*(@[a-z0-9$-]+)(.*)\s*$/i)
+  // )
+  var match = val.match(/^\s*\)(.*)\s*$/)
   if(match) {
-    return prefix + 'getVar("'+match[1]+'")' + parseStr(match[2])
+    // return rest string
+    return match[1]
   }
 
-  // +-*/
-  var match = val.match(/^\s*([\+\-\*\/])(.*)\s*$/)
+  // ,
+  var match = val.match(/^\s*,(.*)\s*$/)
   if (match) {
-    return prefix + '"##'+match[1]+'##"' + parseStr(match[2])
+    // , will ignore and go on
+    return parseStr(match[1], callArr)
   }
 
-  if(/^[\s)]*$/.test(val)) return val
+  // end
+  if(/^\s*$/.test(val)) {
+    return callArr
+  }
 
-  // var func = val.match(/^\s*([a-z]+)\((.*)\)(.*)\s*$/i)
-  // if(0&&func) {
-  //   rs += 'getFuncion("'+ m[1] +'"'
-  //   args = splitComma(m[2], /,/)
-  //   for(var i = 0; i < args.length; i+=2) {
-  //     rs += parseStr(args[i]) + (args[i+1]||'')
-  //   }
-  //   rs += ')'
-  // }
-
-  // // (2px + 3px)
-  // var operate = val.match(/^\s*\((.*)\)(.*)\s*$/)
-  // var operateRe = /^\s*[+-*/]\s*/
-  // if(0&&operate) {
-  //   args = splitComma(operate[1], operateRe)
-  //   rs += args.map(function(v) {
-  //     return parseStr(v)
-  //   }).reduce(function(prev, cur) {
-  //     if(prev.length%3 == 0) prev.push('Operation(' + cur)
-  //     if(prev.length%3 == 1) prev.push(cur)
-  //     if(prev.length%3 == 2) prev.push(cur + ')')
-  //   }, []).join('')
-  // }
-
-  return val
+  // don't kown others, just return
+  return callArr
 }
 
 
@@ -3229,7 +3217,7 @@ function getVar(name, context) {
 }
 
 // operation for css value, Dimension, Color
-function Operation(op, op1, op2) {
+function Operation(op1, op, op2) {
   return function(prev, node) {
     var p = [op1, op2].map(function(v) {
       if(Array.isArray(v)) v = Operation.apply(null, v)(prev, node)
@@ -3286,6 +3274,10 @@ module.exports = {
   getFuncion : getFuncion,
   getMixin : getMixin,
   Operation : Operation,
+  ColorNames : ColorNames,
+  Color : Color,
+  Dimension : Dimension,
+  Functions : Functions,
   lessValuePlugin : lessValuePlugin,
 }
 

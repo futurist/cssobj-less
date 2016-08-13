@@ -53,7 +53,7 @@ function getVar(name, context) {
 }
 
 // operation for css value, Dimension, Color
-function Operation(op, op1, op2) {
+function Operation(op1, op, op2) {
   return function(prev, node) {
     var p = [op1, op2].map(function(v) {
       if(Array.isArray(v)) v = Operation.apply(null, v)(prev, node)
@@ -110,5 +110,9 @@ module.exports = {
   getFuncion : getFuncion,
   getMixin : getMixin,
   Operation : Operation,
+  ColorNames : ColorNames,
+  Color : Color,
+  Dimension : Dimension,
+  Functions : Functions,
   lessValuePlugin : lessValuePlugin,
 }
