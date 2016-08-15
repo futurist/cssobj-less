@@ -4130,8 +4130,8 @@ var obj = extend (
     }, $vars),
     $mixins: $mixins,
     'body ': {
-      // content: 'escape(\'a=1\')',
-      // color: 'darken(spin(#ababab, ceil((ceil(10) + 20 + 30))), 5%)',
+      content: 'escape(\'a=1\')',
+      color: 'darken(spin(#dff0d8, -10), 5%)',
       // fontFamily: '"s  adf", asdf',
       // border: '1px solid black',
       padding: '@padding'
@@ -4213,6 +4213,7 @@ var _extend = require('objutil').extend
 var ColorNames = require('less/lib/less/data/colors')
 var Color = require('less/lib/less/tree/color')
 var Dimension = require('less/lib/less/tree/dimension')
+var Quoted = require('less/lib/less/tree/quoted')
 var Functions = require('less/lib/less/functions')()
 
 function mixin() {
@@ -4293,15 +4294,20 @@ var getObj = function(val) {
 
   if(val.charAt(0)=='#') return new Color(val.slice(1))
 
-  var match = val.match(/^rgba?\((.*)\)/)
+  var match = val.match(/^rgba?\(([^)]*)\)/)
   if(match) {
     var alpha=1, rgba = match[1].split(',')
     var rgb = rgba.length>3 ? (alpha=rgba.pop(), rgba) : rgba
     return new Color(rgb, alpha)
   }
 
-  var match = val.match(/^([0-9.]+)([a-z%]*)/i)
+  var match = val.match(/^([0-9.-]+)([a-z%]*)/i)
   if(match) return new Dimension(match[1], match[2])
+
+  var match = val.match(/^(~)?(['"])(.*).$/)
+  if(match) {
+    return new Quoted(match[2], match[3], !!match[1])
+  }
 
   return val
 }
@@ -4337,7 +4343,7 @@ module.exports = {
   lessValuePlugin : lessValuePlugin,
 }
 
-},{"less/lib/less/data/colors":3,"less/lib/less/functions":11,"less/lib/less/tree/color":20,"less/lib/less/tree/dimension":24,"objutil":36}],44:[function(require,module,exports){
+},{"less/lib/less/data/colors":3,"less/lib/less/functions":11,"less/lib/less/tree/color":20,"less/lib/less/tree/dimension":24,"less/lib/less/tree/quoted":32,"objutil":36}],44:[function(require,module,exports){
 
 var lessHelper = require('./less-helper.js')
 
@@ -4369,7 +4375,7 @@ function parseExpression(str) {
 
   var arr = []
   parseStr(str, arr)
-  // console.log(arr, arr.join(''))
+  console.log(arr, arr.join(''))
   // console.log( 3333, arr[0], applyArr(arr[0]) )
   return Array.isArray(arr[0]) ? applyArr(arr[0]) : arr.join('')
 }

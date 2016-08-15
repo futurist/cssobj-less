@@ -7,6 +7,7 @@ var _extend = require('objutil').extend
 var ColorNames = require('less/lib/less/data/colors')
 var Color = require('less/lib/less/tree/color')
 var Dimension = require('less/lib/less/tree/dimension')
+var Quoted = require('less/lib/less/tree/quoted')
 var Functions = require('less/lib/less/functions')()
 
 function mixin() {
@@ -87,15 +88,20 @@ var getObj = function(val) {
 
   if(val.charAt(0)=='#') return new Color(val.slice(1))
 
-  var match = val.match(/^rgba?\((.*)\)/)
+  var match = val.match(/^rgba?\(([^)]*)\)/)
   if(match) {
     var alpha=1, rgba = match[1].split(',')
     var rgb = rgba.length>3 ? (alpha=rgba.pop(), rgba) : rgba
     return new Color(rgb, alpha)
   }
 
-  var match = val.match(/^([0-9.]+)([a-z%]*)/i)
+  var match = val.match(/^([0-9.-]+)([a-z%]*)/i)
   if(match) return new Dimension(match[1], match[2])
+
+  var match = val.match(/^(~)?(['"])(.*).$/)
+  if(match) {
+    return new Quoted(match[2], match[3], !!match[1])
+  }
 
   return val
 }

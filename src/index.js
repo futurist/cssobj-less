@@ -23,8 +23,8 @@ var obj = extend (
     }, $vars),
     $mixins: $mixins,
     'body ': {
-      // content: 'escape(\'a=1\')',
-      // color: 'darken(spin(#ababab, ceil((ceil(10) + 20 + 30))), 5%)',
+      content: 'escape(\'a=1\')',
+      color: 'darken(spin(#dff0d8, -10), 5%)',
       // fontFamily: '"s  adf", asdf',
       // border: '1px solid black',
       padding: '@padding'
