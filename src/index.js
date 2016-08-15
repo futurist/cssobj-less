@@ -11,17 +11,23 @@ var alert = require('./bootstrap/alert.js')
 
 // extend will overwrite normalize rule
 // make it seperate cssobj first
-lessobj(normalize)
+// lessobj(normalize)
 
 var obj = extend (
   //css for page
   {
     $vars:extend({
-      'padding': '112px'
+      'state1-success-bg': '#dff0d8',
+      'padding': '10px',
+      content: 'escape(\'a=1\')'
     }, $vars),
     $mixins: $mixins,
     'body ': {
-      padding: '10px'
+      // content: 'escape(\'a=1\')',
+      // color: 'darken(spin(#ababab, ceil((ceil(10) + 20 + 30))), 5%)',
+      // fontFamily: '"s  adf", asdf',
+      // border: '1px solid black',
+      padding: '@padding'
     },
     '#control': {
       marginBottom: '20px',

@@ -57,14 +57,23 @@ function getVar(name, context) {
 }
 
 // operation for css value, Dimension, Color
-function Operation(op1, op, op2) {
+function Operation(op1) {
+  var args = [].slice.call(arguments, 1)
   return function(prev, node) {
-    var p = [op1, op2].map(function(v) {
-      if(Array.isArray(v)) v = Operation.apply(null, v)(prev, node)
-      return _getObj(v, node)
-    })
-    var val = p[0].operate({}, op, p[1])
-    return this ? val.toCSS() : val
+    var val = args.reduce(function(prev,cur) {
+      prev.push(cur)
+      if(prev.length<3) return prev
+      else {
+        var p = prev.map(function(v) {
+          // if(Array.isArray(v)) v = Operation.apply(null, v)(prev, node)
+          // v = applyArr(v)
+          // if(typeof v=='function') v = v(prev, node)
+          return _getObj(v, node)
+        })
+        return [p[0].operate({}, p[1], p[2])]
+      }
+    }, [op1])
+    return this ? val.pop().toCSS() : val.pop()
   }
 }
 
