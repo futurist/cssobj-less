@@ -1,18 +1,17 @@
 
 var extend = require('objutil').extend
-var lessHelper = require('./less-helper.js')
-var parser = require('./less-parser.js')
+var lessobj = require('./lessobj.js')
 
-var $vars = require('./bs-vars.js')
-var $mixins = require('./bs-mixins.js')
+var $vars = require('./bootstrap/bs-vars.js')
+var $mixins = require('./bootstrap/bs-mixins.js')
 
-var normalize = require('./normalize.js')
-var scaffolding = require('./scaffolding.js')
-var alert = require('./alert.js')
+var normalize = require('./bootstrap/normalize.js')
+var scaffolding = require('./bootstrap/scaffolding.js')
+var alert = require('./bootstrap/alert.js')
 
 // extend will overwrite normalize rule
 // make it seperate cssobj first
-cssobj(normalize)
+lessobj(normalize)
 
 var obj = extend (
   //css for page
@@ -44,16 +43,11 @@ var obj = extend (
   alert
 )
 
-parser.transform(obj)
-
-var result = cssobj(obj, {
+var result = lessobj(obj, {
   local:{prefix:'my-prefix-'},
   onUpdate: cssobj_plugin_post_csstext(function(v) {
     console.log(v)
-  }),
-  plugins:{
-    value: lessHelper.lessValuePlugin()
-  }
+  })
 })
 
 console.log(result)
