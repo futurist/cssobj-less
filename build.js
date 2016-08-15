@@ -4377,11 +4377,9 @@ function parseExpression(str) {
 
 // apply array of functions
 function applyArr(arr) {
-  return Array.isArray(arr)
-    ? arr[0].apply(null, arr.slice(1).map(function(v) {
-      return Array.isArray(v) ? applyArr(v) : v
-    }))
-  : arr
+  return arr[0].apply(null, arr.slice(1).map(function(v) {
+    return Array.isArray(v) ? applyArr(v) : v
+  }))
 }
 
 
