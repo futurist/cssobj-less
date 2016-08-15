@@ -1,33 +1,7 @@
-var lessHelper = require('./less-helper.js')
-
-var getVar =  lessHelper.getVar,
-    getObj =  lessHelper.getObj,
-    getFuncion =  lessHelper.getFuncion,
-    getMixin =  lessHelper.getMixin,
-    Operation =  lessHelper.Operation,
-    mixin =  lessHelper.mixin,
-    lessValuePlugin =  lessHelper.lessValuePlugin
-
-var $vars = require('./bs-vars.js')
-
-var $mixins = {
-  '.tab-focus': getMixin({
-    outline: '5px auto -webkit-focus-ring-color',
-    outlineOffset: '-2px'
-  }),
-  '.img-responsive': getMixin({
-    $vars:{
-      '@display': 'block'
-    },
-    display: '@display',
-    maxWidth: '100%',
-    height: 'auto'
-  })
-}
+// scaffolding
 
 
 var obj = {
-  $vars: $vars,
   '*': {
     'boxSizing': 'border-box'
   },
@@ -57,7 +31,9 @@ var obj = {
       color: '@link-hover-color',
       textDecoration: '@link-hover-decoration'
     },
-    '&:focus': mixin({}, $mixins['.tab-focus']())
+    '&:focus': {
+      '$mixin': {'.tab-focus': []}
+    }
   },
   figure: {
     margin: 0
@@ -65,18 +41,21 @@ var obj = {
   img: {
     verticalAlign: 'middle'
   },
-  '.img-responsive': mixin({}, $mixins['.img-responsive']()),
+  '.img-responsive': {
+    $mixin: {'.img-responsive':[]}
+  },
   '.img-rounded': {
     borderRadius: '@border-radius-large'
   },
-  '.img-thumbnail': mixin({
+  '.img-thumbnail': {
     padding: '@thumbnail-padding',
     lineHeight: '@line-height-base',
     backgroundColor: '@thumbnail-bg',
     border: '1px solid @thumbnail-border',
     borderRadius: '@thumbnail-border-radius',
-    transition: 'all .2s ease-in-out'
-  }, $mixins['.img-responsive']('inline-block')),
+    transition: 'all .2s ease-in-out',
+    $mixin: {'.img-responsive':[]}
+  },
   '.img-circle': {
     borderRadius: '50%'
   },

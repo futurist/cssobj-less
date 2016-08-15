@@ -18,6 +18,10 @@ function mixin() {
 }
 
 // invoke LESS Functions with param
+function hasFunction(name) {
+  return Functions.functionRegistry.get(name)
+}
+
 function getFuncion(name) {
   var args = [].slice.call(arguments, 1)
   return function(prev, node) {
@@ -107,6 +111,7 @@ module.exports = {
   mixin : mixin,
   getVar : getVar,
   getObj : getObj,
+  hasFunction : hasFunction,
   getFuncion : getFuncion,
   getMixin : getMixin,
   Operation : Operation,

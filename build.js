@@ -2512,41 +2512,7 @@ exports.pick = pick;
 exports.pick2 = pick2;
 exports.defaults = defaults;
 },{}],36:[function(require,module,exports){
-var lessHelper = require('./less-helper.js')
-
-var getVar =  lessHelper.getVar,
-    getObj =  lessHelper.getObj,
-    getFuncion =  lessHelper.getFuncion,
-    getMixin =  lessHelper.getMixin,
-    Operation =  lessHelper.Operation,
-    mixin =  lessHelper.mixin,
-    lessValuePlugin =  lessHelper.lessValuePlugin
-
-var $vars = require('./bs-vars.js')
-
-var $mixins = {
-  '.alert-variant': getMixin({
-    $vars: {
-      'background': '',
-      'border': '',
-      'text-color': ''
-    },
-    backgroundColor: '@background',
-    borderColor: '@border',
-    color: '@text-color',
-    hr: {
-      color: 'red',
-      borderTopColor: getFuncion('darken', '@border', '5%')
-    },
-    '.alert-link': {
-      color: getFuncion('darken', '@text-color', '10%')
-    }
-  })
-}
-
-
 var obj = {
-  $vars: $vars,
   '.alert': {
     padding: '@alert-padding',
     marginBottom: '@line-height-computed',
@@ -2567,7 +2533,7 @@ var obj = {
     }
   },
   '.alert-dismissable,  .alert-dismissible': {
-    paddingRight: Operation('+', '@alert-padding', 20),
+    paddingRight: '(@alert-padding + 20)',
     '.close': {
       position: 'relative',
       top: '-2px',
@@ -2575,40 +2541,76 @@ var obj = {
       color: 'inherit'
     }
   },
-  '.alert-success': mixin({},
-    $mixins['.alert-variant']('@alert-success-bg', '@alert-success-border', '@alert-success-text')
-  ),
-  '.alert-info': mixin({},
-    $mixins['.alert-variant']('@alert-info-bg', '@alert-info-border', '@alert-info-text')
-  ),
-  '.alert-warning': mixin({},
-    $mixins['.alert-variant']('@alert-warning-bg', '@alert-warning-border', '@alert-warning-text')
-  ),
-  '.alert-danger': mixin({},
-    $mixins['.alert-variant']('@alert-danger-bg', '@alert-danger-border', '@alert-danger-text')
-  )
+  '.alert-success': {
+    $mixin: {
+      '.alert-variant': ['@alert-success-bg', '@alert-success-border', '@alert-success-text']
+    }
+  },
+  '.alert-info': {
+    $mixin: {'.alert-variant': ['@alert-info-bg', '@alert-info-border', '@alert-info-text']}
+  },
+  '.alert-warning': {
+    $mixin: {'.alert-variant': ['@alert-warning-bg', '@alert-warning-border', '@alert-warning-text']}
+  },
+  '.alert-danger': {
+    $mixin: {'.alert-variant': ['@alert-danger-bg', '@alert-danger-border', '@alert-danger-text']}
+  }
 }
 
 module.exports = obj
 
-},{"./bs-vars.js":37,"./less-helper.js":39}],37:[function(require,module,exports){
-// all bootstrap vars
-var lessHelper = require('./less-helper.js')
+},{}],37:[function(require,module,exports){
+// bs-mixins
 
-var getVar =  lessHelper.getVar,
-    getObj =  lessHelper.getObj,
-    getFuncion =  lessHelper.getFuncion,
-    getMixin =  lessHelper.getMixin,
-    Operation =  lessHelper.Operation
+
+var obj = {
+  // scaffolding
+  '.tab-focus': {
+    outline: '5px auto -webkit-focus-ring-color',
+    outlineOffset: '-2px'
+  },
+  '.img-responsive': {
+    $vars:{
+      '@display': 'block'
+    },
+    display: '@display',
+    maxWidth: '100%',
+    height: 'auto'
+  },
+
+  // alert
+  '.alert-variant': {
+    $vars: {
+      'background': '',
+      'border': '',
+      'text-color': ''
+    },
+    backgroundColor: '@background',
+    borderColor: '@border',
+    color: '@text-color',
+    hr: {
+      borderTopColor: 'darken(@border, 5%)'
+    },
+    '.alert-link': {
+      color: 'darken(@text-color, 10%)'
+    }
+  }
+}
+
+
+module.exports = obj
+
+},{}],38:[function(require,module,exports){
+// all bootstrap vars
 
 module.exports = {
   'gray-base': '#000',
-  'gray-darker': getFuncion('lighten', '@gray-base', '13.5%'),
-  'gray-dark': getFuncion('lighten', '@gray-base', '20%'),
-  'gray': getFuncion('lighten', '@gray-base', '33.5%'),
-  'gray-light': getFuncion('lighten', '@gray-base', '46.7%'),
-  'gray-lighter': getFuncion('lighten', '@gray-base', '93.5%'),
-  'brand-primary': getFuncion('darken', '#428bca', '6.5%'),
+  'gray-darker': 'lighten(@gray-base, 13.5%)',
+  'gray-dark': 'lighten(@gray-base, 20%)',
+  'gray': 'lighten(@gray-base, 33.5%)',
+  'gray-light': 'lighten(@gray-base, 46.7%)',
+  'gray-lighter': 'lighten(@gray-base, 93.5%)',
+  'brand-primary': 'darken(#428bca, 6.5%)',
   'brand-success': '#5cb85c',
   'brand-info': '#5bc0de',
   'brand-warning': '#f0ad4e',
@@ -2616,23 +2618,23 @@ module.exports = {
   'body-bg': '#fff',
   'text-color': '@gray-dark',
   'link-color': '@brand-primary',
-  'link-hover-color': getFuncion('darken', '@link-color', '15%'),
+  'link-hover-color': 'darken(@link-color, 15%)',
   'link-hover-decoration': 'underline',
   'font-family-sans-serif': '"Helvetica Neue", Helvetica, Arial, sans-serif',
   'font-family-serif': 'Georgia, "Times New Roman", Times, serif',
   'font-family-monospace': 'Menlo, Monaco, Consolas, "Courier New", monospace',
   'font-family-base': '@font-family-sans-serif',
   'font-size-base': '14px',
-  'font-size-large': getFuncion('ceil', Operation('*', '@font-size-base', 1.25)),
-  'font-size-small': getFuncion('ceil', Operation('*', '@font-size-base', 0.85)),
-  'font-size-h1': getFuncion('floor', Operation('*', '@font-size-base', 2.6)),
-  'font-size-h2': getFuncion('floor', Operation('*', '@font-size-base', 2.15)),
-  'font-size-h3': getFuncion('ceil', Operation('*', '@font-size-base', 1.7)),
-  'font-size-h4': getFuncion('ceil', Operation('*', '@font-size-base', 1.25)),
+  'font-size-large': 'ceil((@font-size-base * 1.25))',
+  'font-size-small': 'ceil((@font-size-base * 0.85))',
+  'font-size-h1': 'floor((@font-size-base * 2.6))',
+  'font-size-h2': 'floor((@font-size-base * 2.15))',
+  'font-size-h3': 'ceil((@font-size-base * 1.7))',
+  'font-size-h4': 'ceil((@font-size-base * 1.25))',
   'font-size-h5': '@font-size-base',
-  'font-size-h6': getFuncion('ceil', Operation('*', '@font-size-base', 0.85)),
+  'font-size-h6': 'ceil((@font-size-base * 0.85))',
   'line-height-base': 1.428571429,
-  'line-height-computed': getFuncion('floor', Operation('*', '@font-size-base', '@line-height-base')),
+  'line-height-computed': 'floor((@font-size-base * @line-height-base))',
   'headings-font-family': 'inherit',
   'headings-font-weight': 500,
   'headings-line-height': 1.1,
@@ -2670,19 +2672,19 @@ module.exports = {
   'btn-default-border': '#ccc',
   'btn-primary-color': '#fff',
   'btn-primary-bg': '@brand-primary',
-  'btn-primary-border': getFuncion('darken', '@btn-primary-bg', '5%'),
+  'btn-primary-border': 'darken(@btn-primary-bg, 5%)',
   'btn-success-color': '#fff',
   'btn-success-bg': '@brand-success',
-  'btn-success-border': getFuncion('darken', '@btn-success-bg', '5%'),
+  'btn-success-border': 'darken(@btn-success-bg, 5%)',
   'btn-info-color': '#fff',
   'btn-info-bg': '@brand-info',
-  'btn-info-border': getFuncion('darken', '@btn-info-bg', '5%'),
+  'btn-info-border': 'darken(@btn-info-bg, 5%)',
   'btn-warning-color': '#fff',
   'btn-warning-bg': '@brand-warning',
-  'btn-warning-border': getFuncion('darken', '@btn-warning-bg', '5%'),
+  'btn-warning-border': 'darken(@btn-warning-bg, 5%)',
   'btn-danger-color': '#fff',
   'btn-danger-bg': '@brand-danger',
-  'btn-danger-border': getFuncion('darken', '@btn-danger-bg', '5%'),
+  'btn-danger-border': 'darken(@btn-danger-bg, 5%)',
   'btn-link-disabled-color': '@gray-light',
   'btn-border-radius-base': '@border-radius-base',
   'btn-border-radius-large': '@border-radius-large',
@@ -2696,9 +2698,9 @@ module.exports = {
   'input-border-radius-small': '@border-radius-small',
   'input-border-focus': '#66afe9',
   'input-color-placeholder': '#999',
-  'input-height-base': Operation('+', Operation('+', '@line-height-computed', Operation('*', '@padding-base-vertical', 2)), 2),
-  'input-height-large': Operation('+', Operation('+', getFuncion('ceil', Operation('*', '@font-size-large', '@line-height-large')), Operation('*', '@padding-large-vertical', 2)), 2),
-  'input-height-small': Operation('+', Operation('+', getFuncion('floor', Operation('*', '@font-size-small', '@line-height-small')), Operation('*', '@padding-small-vertical', 2)), 2),
+  'input-height-base': '(@line-height-computed + (@padding-base-vertical * 2) + 2)',
+  'input-height-large': '(ceil(@font-size-large * @line-height-large) + (@padding-large-vertical * 2) + 2)',
+  'input-height-small': '(floor(@font-size-small * @line-height-small) + (@padding-small-vertical * 2) + 2)',
   'form-group-margin-bottom': '15px',
   'legend-color': '@gray-dark',
   'legend-border-color': '#e5e5e5',
@@ -2710,7 +2712,7 @@ module.exports = {
   'dropdown-fallback-border': '#ccc',
   'dropdown-divider-bg': '#e5e5e5',
   'dropdown-link-color': '@gray-dark',
-  'dropdown-link-hover-color': getFuncion('darken', '@gray-dark', '5%'),
+  'dropdown-link-hover-color': 'darken(@gray-dark, 5%)',
   'dropdown-link-hover-bg': '#f5f5f5',
   'dropdown-link-active-color': '@component-active-color',
   'dropdown-link-active-bg': '@component-active-bg',
@@ -2736,49 +2738,49 @@ module.exports = {
   'screen-lg': '1200px',
   'screen-lg-min': '@screen-lg',
   'screen-lg-desktop': '@screen-lg-min',
-  'screen-xs-max': Operation('-', '@screen-sm-min', 1),
-  'screen-sm-max': Operation('-', '@screen-md-min', 1),
-  'screen-md-max': Operation('-', '@screen-lg-min', 1),
+  'screen-xs-max': '(@screen-sm-min - 1)',
+  'screen-sm-max': '(@screen-md-min - 1)',
+  'screen-md-max': '(@screen-lg-min - 1)',
   'grid-columns': 12,
   'grid-gutter-width': '30px',
   'grid-float-breakpoint': '@screen-sm-min',
-  'grid-float-breakpoint-max': Operation('-', '@grid-float-breakpoint', 1),
-  'container-tablet': Operation('+', '720px', '@grid-gutter-width'),
+  'grid-float-breakpoint-max': '(@grid-float-breakpoint - 1)',
+  'container-tablet': '(720px + @grid-gutter-width)',
   'container-sm': '@container-tablet',
-  'container-desktop': Operation('+', '940px', '@grid-gutter-width'),
+  'container-desktop': '(940px + @grid-gutter-width)',
   'container-md': '@container-desktop',
-  'container-large-desktop': Operation('+', '1140px', '@grid-gutter-width'),
+  'container-large-desktop': '(1140px + @grid-gutter-width)',
   'container-lg': '@container-large-desktop',
   'navbar-height': '50px',
   'navbar-margin-bottom': '@line-height-computed',
   'navbar-border-radius': '@border-radius-base',
-  'navbar-padding-horizontal': getFuncion('floor', Operation('/', '@grid-gutter-width', 2)),
-  'navbar-padding-vertical': Operation('/', Operation('-', '@navbar-height', '@line-height-computed') ,2),
+  'navbar-padding-horizontal': 'floor((@grid-gutter-width / 2))',
+  'navbar-padding-vertical': '((@navbar-height - @line-height-computed) / 2)',
   'navbar-collapse-max-height': '340px',
   'navbar-default-color': '#777',
   'navbar-default-bg': '#f8f8f8',
-  'navbar-default-border': getFuncion('darken', '@navbar-default-bg', '6.5%'),
+  'navbar-default-border': 'darken(@navbar-default-bg, 6.5%)',
   'navbar-default-link-color': '#777',
   'navbar-default-link-hover-color': '#333',
   'navbar-default-link-hover-bg': 'transparent',
   'navbar-default-link-active-color': '#555',
-  'navbar-default-link-active-bg': getFuncion('darken', '@navbar-default-bg', '6.5%'),
+  'navbar-default-link-active-bg': 'darken(@navbar-default-bg, 6.5%)',
   'navbar-default-link-disabled-color': '#ccc',
   'navbar-default-link-disabled-bg': 'transparent',
   'navbar-default-brand-color': '@navbar-default-link-color',
-  'navbar-default-brand-hover-color': getFuncion('darken', '@navbar-default-brand-color', '10%'),
+  'navbar-default-brand-hover-color': 'darken(@navbar-default-brand-color, 10%)',
   'navbar-default-brand-hover-bg': 'transparent',
   'navbar-default-toggle-hover-bg': '#ddd',
   'navbar-default-toggle-icon-bar-bg': '#888',
   'navbar-default-toggle-border-color': '#ddd',
-  'navbar-inverse-color': getFuncion('lighten', '@gray-light', '15%'),
+  'navbar-inverse-color': 'lighten(@gray-light, 15%)',
   'navbar-inverse-bg': '#222',
-  'navbar-inverse-border': getFuncion('darken', '@navbar-inverse-bg', '10%'),
-  'navbar-inverse-link-color': getFuncion('lighten', '@gray-light', '15%'),
+  'navbar-inverse-border': 'darken(@navbar-inverse-bg, 10%)',
+  'navbar-inverse-link-color': 'lighten(@gray-light, 15%)',
   'navbar-inverse-link-hover-color': '#fff',
   'navbar-inverse-link-hover-bg': 'transparent',
   'navbar-inverse-link-active-color': '@navbar-inverse-link-hover-color',
-  'navbar-inverse-link-active-bg': getFuncion('darken', '@navbar-inverse-bg', '10%'),
+  'navbar-inverse-link-active-bg': 'darken(@navbar-inverse-bg, 10%)',
   'navbar-inverse-link-disabled-color': '#444',
   'navbar-inverse-link-disabled-bg': 'transparent',
   'navbar-inverse-brand-color': '@navbar-inverse-link-color',
@@ -2824,20 +2826,20 @@ module.exports = {
   'jumbotron-color': 'inherit',
   'jumbotron-bg': '@gray-lighter',
   'jumbotron-heading-color': 'inherit',
-  'jumbotron-font-size': getFuncion('ceil', Operation('*', '@font-size-base', 1.5)),
-  'jumbotron-heading-font-size': getFuncion('ceil', Operation('*', '@font-size-base', 4.5)),
+  'jumbotron-font-size': 'ceil((@font-size-base * 1.5))',
+  'jumbotron-heading-font-size': 'ceil((@font-size-base * 4.5))',
   'state-success-text': '#3c763d',
   'state-success-bg': '#dff0d8',
-  'state-success-border': getFuncion('darken', getFuncion('spin', '@state-success-bg', -10), '5%'),
+  'state-success-border': 'darken(spin(@state-success-bg, -10), 5%)',
   'state-info-text': '#31708f',
   'state-info-bg': '#d9edf7',
-  'state-info-border': getFuncion('darken', getFuncion('spin', '@state-info-bg', -10), '7%'),
+  'state-info-border': 'darken(spin(@state-info-bg, -10), 7%)',
   'state-warning-text': '#8a6d3b',
   'state-warning-bg': '#fcf8e3',
-  'state-warning-border': getFuncion('darken', getFuncion('spin', '@state-warning-bg', -10), '5%'),
+  'state-warning-border': 'darken(spin(@state-warning-bg, -10), 5%)',
   'state-danger-text': '#a94442',
   'state-danger-bg': '#f2dede',
-  'state-danger-border': getFuncion('darken', getFuncion('spin', '@state-danger-bg', -10), '5%'),
+  'state-danger-border': 'darken(spin(@state-danger-bg, -10), 5%)',
   'tooltip-max-width': '200px',
   'tooltip-color': '#fff',
   'tooltip-bg': '#000',
@@ -2848,12 +2850,12 @@ module.exports = {
   'popover-max-width': '276px',
   'popover-border-color': 'rgba(0,0,0,.2)',
   'popover-fallback-border-color': '#ccc',
-  'popover-title-bg': getFuncion('darken', '@popover-bg', '3%'),
+  'popover-title-bg': 'darken(@popover-bg, 3%)',
   'popover-arrow-width': '10px',
   'popover-arrow-color': '@popover-bg',
-  'popover-arrow-outer-width': Operation('+', '@popover-arrow-width', 1),
-  'popover-arrow-outer-color': getFuncion('fadein', '@popover-border-color', '5%'),
-  'popover-arrow-outer-fallback-color': getFuncion('darken', '@popover-fallback-border-color', '20%'),
+  'popover-arrow-outer-width': '(@popover-arrow-width + 1)',
+  'popover-arrow-outer-color': 'fadein(@popover-border-color, 5%)',
+  'popover-arrow-outer-fallback-color': 'darken(@popover-fallback-border-color, 20%)',
   'label-default-bg': '@gray-light',
   'label-primary-bg': '@brand-primary',
   'label-success-bg': '@brand-success',
@@ -2905,7 +2907,7 @@ module.exports = {
   'list-group-active-color': '@component-active-color',
   'list-group-active-bg': '@component-active-bg',
   'list-group-active-border': '@list-group-active-bg',
-  'list-group-active-text-color': getFuncion('lighten', '@list-group-active-bg', '40%'),
+  'list-group-active-text-color': 'lighten(@list-group-active-bg, 40%)',
   'list-group-disabled-color': '@gray-light',
   'list-group-disabled-bg': '@gray-lighter',
   'list-group-disabled-text-color': '@list-group-disabled-color',
@@ -2944,7 +2946,7 @@ module.exports = {
   'thumbnail-caption-color': '@text-color',
   'thumbnail-caption-padding': '9px',
   'well-bg': '#f5f5f5',
-  'well-border': getFuncion('darken', '@well-bg', '7%'),
+  'well-border': 'darken(@well-bg, 7%)',
   'badge-color': '#fff',
   'badge-link-hover-color': '#fff',
   'badge-bg': '@gray-light',
@@ -2983,7 +2985,7 @@ module.exports = {
   'abbr-border-color': '@gray-light',
   'headings-small-color': '@gray-light',
   'blockquote-small-color': '@gray-light',
-  'blockquote-font-size': Operation('*', '@font-size-base', 1.25),
+  'blockquote-font-size': '(@font-size-base * 1.25)',
   'blockquote-border-color': '@gray-lighter',
   'page-header-border-color': '@gray-lighter',
   'dl-horizontal-offset': '@component-offset-horizontal',
@@ -2991,27 +2993,32 @@ module.exports = {
   'hr-border': '@gray-lighter'
 }
 
-},{"./less-helper.js":39}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 
 var extend = require('objutil').extend
+var lessHelper = require('./less-helper.js')
+var parser = require('./less-parser.js')
+
+var $vars = require('./bs-vars.js')
+var $mixins = require('./bs-mixins.js')
+
 var normalize = require('./normalize.js')
 var scaffolding = require('./scaffolding.js')
 var alert = require('./alert.js')
-var $vars = require('./bs-vars.js')
-var lessHelper = require('./less-helper.js')
 
 // extend will overwrite normalize rule
 // make it seperate cssobj first
 cssobj(normalize)
 
-var obj = extend(
+var obj = extend (
   //css for page
   {
-    $vars:{
+    $vars:extend({
       'padding': '112px'
-    },
+    }, $vars),
+    $mixins: $mixins,
     'body ': {
-      padding: parseExpression('(@padding - 100)')
+      padding: '10px'
     },
     '#control': {
       marginBottom: '20px',
@@ -3023,20 +3030,22 @@ var obj = extend(
       width: '100px'
     },
     'input[disabled]':{
-      width: '140px',
+      width: '10em',
       border:'none',
       background:'none'
     }
-  }
+  },
   //css from bootstrap
-  // scaffolding,
-  // alert
+  scaffolding,
+  alert
 )
+
+parser.transform(obj)
 
 var result = cssobj(obj, {
   local:{prefix:'my-prefix-'},
   onUpdate: cssobj_plugin_post_csstext(function(v) {
-    // console.log(v)
+    console.log(v)
   }),
   plugins:{
     value: lessHelper.lessValuePlugin()
@@ -3072,100 +3081,18 @@ window.onload = function() {
     'state-success-bg',
     'state-success-text'
   ].forEach(function(v, i) {
-    var val = $vars[v]
+    var val = result.obj.$vars[v]
     $(v).value = val.charAt(0)=='#' ? val: parseInt(val)
     $(v).onchange = function() {
-      $('val'+i).innerHTML = $vars[v] = this.value + (this.getAttribute('data-unit')||'')
+      $('val'+i).innerHTML = result.obj.$vars[v] = this.value + (this.getAttribute('data-unit')||'')
       updateCSS()
     }
     $(v).onchange()
   })
 }
 
-function parseExpression(str) {
-  // var str = 'ceil((@font-size-base * -1.7))'
-  // str = '(ceil((8.2 - 3)) + (3 + 2))'
 
-  var arr = []
-  parseStr(str, arr)
-  // console.log( 3333, arr[0], applyArr(arr[0]) )
-  return applyArr(arr[0])
-}
-
-console.log( parseExpression('--zfff + 333') )
-
-function applyArr(arr) {
-  return Array.isArray(arr)
-    ? arr[0].apply(null, arr.slice(1).map(function(v) {
-      return Array.isArray(v) ? applyArr(v) : v
-    }))
-  : arr
-}
-
-function parseStr(val, callArr) {
-  var ret
-
-  val += ''
-
-  val = lessHelper.ColorNames[val] || val
-
-  // color rgba(), #333, @var-name
-  var match = val.match(/^\s*(rgba?\([^)]*\))(.*)$/i)  //rgba
-      || val.match(/^\s*(#[0-9A-F]+)(.*)$/i)  //#333
-      || val.match(/^\s*(@[a-z0-9$-]+)(.*)\s*$/i) //@var-name
-      || val.match(/^\s*([0-9.-]+[a-f%]*)(.*)\s*$/i)  //-10px
-      || val.match(/^\s*([\+\-\*\/])(.*)\s*$/)  // +-*/
-  if(match) {
-    callArr.push(match[1])
-    return parseStr(match[2], callArr)
-  }
-
-  // ceil()
-  var match = val.match(/^\s*([a-z]+)\((.*)\s*$/i)
-  if (match) {
-    var arr = [lessHelper.getFuncion, match[1]]
-    var rest = parseStr(match[2], arr)
-    // callArr.push(arr[0].apply(null, arr.slice(1)))
-    callArr.push(arr)
-    return parseStr(rest, callArr)
-  }
-
-  // operate()
-  var match = val.match(/^\s*\((.*)\s*$/i)
-  if(match) {
-    var arr = [lessHelper.Operation]
-    var rest = parseStr(match[1], arr)
-    // callArr.push(arr[0].apply(null, arr.slice(1)))
-    callArr.push(arr)
-    return parseStr(rest, callArr)
-  }
-
-  // )
-  var match = val.match(/^\s*\)(.*)\s*$/)
-  if(match) {
-    // return rest string
-    return match[1]
-  }
-
-  // ,
-  var match = val.match(/^\s*,(.*)\s*$/)
-  if (match) {
-    // , will ignore and go on
-    return parseStr(match[1], callArr)
-  }
-
-  // end
-  if(/^\s*$/.test(val)) {
-    return callArr
-  }
-
-  // don't kown others, just return
-  return callArr
-}
-
-
-
-},{"./alert.js":36,"./bs-vars.js":37,"./less-helper.js":39,"./normalize.js":40,"./scaffolding.js":41,"objutil":35}],39:[function(require,module,exports){
+},{"./alert.js":36,"./bs-mixins.js":37,"./bs-vars.js":38,"./less-helper.js":40,"./less-parser.js":41,"./normalize.js":42,"./scaffolding.js":43,"objutil":35}],40:[function(require,module,exports){
 'use strict'
 // use strict-mode to get func.call work with right this
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/call
@@ -3186,6 +3113,10 @@ function mixin() {
 }
 
 // invoke LESS Functions with param
+function hasFunction(name) {
+  return Functions.functionRegistry.get(name)
+}
+
 function getFuncion(name) {
   var args = [].slice.call(arguments, 1)
   return function(prev, node) {
@@ -3275,6 +3206,7 @@ module.exports = {
   mixin : mixin,
   getVar : getVar,
   getObj : getObj,
+  hasFunction : hasFunction,
   getFuncion : getFuncion,
   getMixin : getMixin,
   Operation : Operation,
@@ -3285,7 +3217,128 @@ module.exports = {
   lessValuePlugin : lessValuePlugin,
 }
 
-},{"less/lib/less/data/colors":2,"less/lib/less/functions":10,"less/lib/less/tree/color":19,"less/lib/less/tree/dimension":23,"objutil":35}],40:[function(require,module,exports){
+},{"less/lib/less/data/colors":2,"less/lib/less/functions":10,"less/lib/less/tree/color":19,"less/lib/less/tree/dimension":23,"objutil":35}],41:[function(require,module,exports){
+
+var lessHelper = require('./less-helper.js')
+
+function walkObj(obj, option) {
+  option = option||{}
+
+  $mixins = option.mixins = option.mixins||obj.$mixins
+  if(obj.$mixin)
+    for(var k in obj.$mixin){
+      lessHelper.mixin(obj, $mixins[k].apply(null, obj.$mixin[k]))
+    }
+
+  for(var k in obj) {
+    if(!obj.hasOwnProperty(k)) continue
+    var v = obj[k]
+    // if(k=='$mixin' && $mixins[v[0]]) lessHelper.mixin(obj, $mixins[v[0]].apply(null, v.slice(1)))
+    if(typeof v=='string') obj[k] = parseExpression(v)
+    if(v && typeof v=='object') walkObj(v, option)
+  }
+  return obj
+}
+
+
+function parseExpression(str) {
+  // var str = 'ceil((@font-size-base * -1.7))'
+  // str = '(ceil((8.2 - 3)) + (3 + 2))'
+
+  var arr = []
+  parseStr(str, arr)
+  console.log(arr[0])
+  // console.log( 3333, arr[0], applyArr(arr[0]) )
+  return applyArr(arr[0])
+}
+
+function applyArr(arr) {
+  return Array.isArray(arr)
+    ? arr[0].apply(null, arr.slice(1).map(function(v) {
+      return Array.isArray(v) ? applyArr(v) : v
+    }))
+  : arr
+}
+
+function parseStr(val, callArr) {
+  var ret
+
+  val += ''
+
+  val = lessHelper.ColorNames[val] || val
+
+  // color rgba(), #333, @var-name
+  var match = val.match(/^\s*(rgba?\([^)]*\))(.*)$/i)  //rgba
+      || val.match(/^\s*(#[0-9A-F]+)(.*)$/i)  //#333
+      || val.match(/^\s*(@[a-z0-9$-]+)(.*)\s*$/i) //@var-name
+      || val.match(/^\s*([0-9.-]+[a-z%]*)(.*)\s*$/i)  //-10px
+      || val.match(/^\s*([\+\-\*\/])(.*)\s*$/)  // +-*/
+  if(match) {
+    callArr.push(match[1])
+    return parseStr(match[2], callArr)
+  }
+
+  // ceil()
+  var match = val.match(/^\s*([a-z]+)\((.*)\s*$/i)
+  if (match && lessHelper.hasFunction(match[1]) ) {
+    var arr = [lessHelper.getFuncion, match[1]]
+    var rest = parseStr(match[2], arr)
+    // callArr.push(arr[0].apply(null, arr.slice(1)))
+    callArr.push(arr)
+    return parseStr(rest, callArr)
+  }
+
+  // operate()
+  var match = val.match(/^\s*\((.*)\s*$/i)
+  if(match) {
+    var arr = [lessHelper.Operation]
+    var rest = parseStr(match[1], arr)
+    // callArr.push(arr[0].apply(null, arr.slice(1)))
+    callArr.push(arr)
+    return parseStr(rest, callArr)
+  }
+
+  // )
+  var match = val.match(/^\s*\)(.*)\s*$/)
+  if(match) {
+    // return rest string
+    return match[1]
+  }
+
+  // ,
+  var match = val.match(/^\s*,(.*)\s*$/)
+  if (match) {
+    // , will ignore and go on
+    return parseStr(match[1], callArr)
+  }
+
+  // end
+  if(/^\s*$/.test(val)) {
+    return callArr
+  }
+
+  // don't kown others, just return
+  callArr.push(val)
+  return callArr
+}
+
+function transform(obj) {
+  var mixins = obj.$mixins
+  if(mixins)
+    for(var k in mixins) {
+      mixins[k] = lessHelper.getMixin(mixins[k])
+    }
+  return walkObj(obj)
+}
+
+
+module.exports = {
+  transform: transform,
+  parse: parseExpression
+}
+
+
+},{"./less-helper.js":40}],42:[function(require,module,exports){
 var obj = {
   html: {
     fontFamily: 'sans-serif',
@@ -3435,37 +3488,11 @@ module.exports = obj
 
 
 
-},{}],41:[function(require,module,exports){
-var lessHelper = require('./less-helper.js')
-
-var getVar =  lessHelper.getVar,
-    getObj =  lessHelper.getObj,
-    getFuncion =  lessHelper.getFuncion,
-    getMixin =  lessHelper.getMixin,
-    Operation =  lessHelper.Operation,
-    mixin =  lessHelper.mixin,
-    lessValuePlugin =  lessHelper.lessValuePlugin
-
-var $vars = require('./bs-vars.js')
-
-var $mixins = {
-  '.tab-focus': getMixin({
-    outline: '5px auto -webkit-focus-ring-color',
-    outlineOffset: '-2px'
-  }),
-  '.img-responsive': getMixin({
-    $vars:{
-      '@display': 'block'
-    },
-    display: '@display',
-    maxWidth: '100%',
-    height: 'auto'
-  })
-}
+},{}],43:[function(require,module,exports){
+// scaffolding
 
 
 var obj = {
-  $vars: $vars,
   '*': {
     'boxSizing': 'border-box'
   },
@@ -3495,7 +3522,9 @@ var obj = {
       color: '@link-hover-color',
       textDecoration: '@link-hover-decoration'
     },
-    '&:focus': mixin({}, $mixins['.tab-focus']())
+    '&:focus': {
+      '$mixin': {'.tab-focus': []}
+    }
   },
   figure: {
     margin: 0
@@ -3503,18 +3532,21 @@ var obj = {
   img: {
     verticalAlign: 'middle'
   },
-  '.img-responsive': mixin({}, $mixins['.img-responsive']()),
+  '.img-responsive': {
+    $mixin: {'.img-responsive':[]}
+  },
   '.img-rounded': {
     borderRadius: '@border-radius-large'
   },
-  '.img-thumbnail': mixin({
+  '.img-thumbnail': {
     padding: '@thumbnail-padding',
     lineHeight: '@line-height-base',
     backgroundColor: '@thumbnail-bg',
     border: '1px solid @thumbnail-border',
     borderRadius: '@thumbnail-border-radius',
-    transition: 'all .2s ease-in-out'
-  }, $mixins['.img-responsive']('inline-block')),
+    transition: 'all .2s ease-in-out',
+    $mixin: {'.img-responsive':[]}
+  },
   '.img-circle': {
     borderRadius: '50%'
   },
@@ -3551,4 +3583,4 @@ var obj = {
 
 module.exports = obj
 
-},{"./bs-vars.js":37,"./less-helper.js":39}]},{},[38]);
+},{}]},{},[39]);

@@ -1,38 +1,4 @@
-var lessHelper = require('./less-helper.js')
-
-var getVar =  lessHelper.getVar,
-    getObj =  lessHelper.getObj,
-    getFuncion =  lessHelper.getFuncion,
-    getMixin =  lessHelper.getMixin,
-    Operation =  lessHelper.Operation,
-    mixin =  lessHelper.mixin,
-    lessValuePlugin =  lessHelper.lessValuePlugin
-
-var $vars = require('./bs-vars.js')
-
-var $mixins = {
-  '.alert-variant': getMixin({
-    $vars: {
-      'background': '',
-      'border': '',
-      'text-color': ''
-    },
-    backgroundColor: '@background',
-    borderColor: '@border',
-    color: '@text-color',
-    hr: {
-      color: 'red',
-      borderTopColor: getFuncion('darken', '@border', '5%')
-    },
-    '.alert-link': {
-      color: getFuncion('darken', '@text-color', '10%')
-    }
-  })
-}
-
-
 var obj = {
-  $vars: $vars,
   '.alert': {
     padding: '@alert-padding',
     marginBottom: '@line-height-computed',
@@ -53,7 +19,7 @@ var obj = {
     }
   },
   '.alert-dismissable,  .alert-dismissible': {
-    paddingRight: Operation('+', '@alert-padding', 20),
+    paddingRight: '(@alert-padding + 20)',
     '.close': {
       position: 'relative',
       top: '-2px',
@@ -61,18 +27,20 @@ var obj = {
       color: 'inherit'
     }
   },
-  '.alert-success': mixin({},
-    $mixins['.alert-variant']('@alert-success-bg', '@alert-success-border', '@alert-success-text')
-  ),
-  '.alert-info': mixin({},
-    $mixins['.alert-variant']('@alert-info-bg', '@alert-info-border', '@alert-info-text')
-  ),
-  '.alert-warning': mixin({},
-    $mixins['.alert-variant']('@alert-warning-bg', '@alert-warning-border', '@alert-warning-text')
-  ),
-  '.alert-danger': mixin({},
-    $mixins['.alert-variant']('@alert-danger-bg', '@alert-danger-border', '@alert-danger-text')
-  )
+  '.alert-success': {
+    $mixin: {
+      '.alert-variant': ['@alert-success-bg', '@alert-success-border', '@alert-success-text']
+    }
+  },
+  '.alert-info': {
+    $mixin: {'.alert-variant': ['@alert-info-bg', '@alert-info-border', '@alert-info-text']}
+  },
+  '.alert-warning': {
+    $mixin: {'.alert-variant': ['@alert-warning-bg', '@alert-warning-border', '@alert-warning-text']}
+  },
+  '.alert-danger': {
+    $mixin: {'.alert-variant': ['@alert-danger-bg', '@alert-danger-border', '@alert-danger-text']}
+  }
 }
 
 module.exports = obj
