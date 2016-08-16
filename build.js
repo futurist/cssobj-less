@@ -4130,7 +4130,7 @@ var obj = extend (
     }, $vars),
     $mixins: $mixins,
     'body ': {
-      content: 'escape(\'a=1\')',
+      content: 'escape(~\'a=1\')',
       color: 'darken(spin(#dff0d8, -10), 5%)',
       // fontFamily: '"s  adf", asdf',
       // border: '1px solid black',
@@ -4375,7 +4375,7 @@ function parseExpression(str) {
 
   var arr = []
   parseStr(str, arr)
-  console.log(arr, arr.join(''))
+  // console.log(arr, arr.join(''))
   // console.log( 3333, arr[0], applyArr(arr[0]) )
   return Array.isArray(arr[0]) ? applyArr(arr[0]) : arr.join('')
 }
@@ -4421,8 +4421,8 @@ function parseStr(val, callArr, parent) {
       || val.match(/^\s*(@[a-z0-9$-]+)(.*)\s*$/i) //@var-name
       || val.match(/^\s*([0-9.-]+[a-z%]*)(.*)\s*$/i)  //-10px
       || val.match(/^\s*([\+\-\*\/])(.*)\s*$/)  // +-*/
-      || val.match(/(""|".*?[^\\]")(.*)\s*$/)  // "con\\"tent" quoted string
-      || val.match(/(''|'.*?[^\\]')(.*)\s*$/)  // 'con\\'tent' quoted string
+      || val.match(/(~?""|~?".*?[^\\]")(.*)\s*$/)  // "con\\"tent" quoted string
+      || val.match(/(~?''|~?'.*?[^\\]')(.*)\s*$/)  // 'con\\'tent' quoted string
     if(match) {
       callArr.push(match[1])
       return parseStr(match[2], callArr, parent)
