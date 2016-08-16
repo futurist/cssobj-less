@@ -4,7 +4,6 @@ var lessobj = require('./lessobj.js')
 
 var $vars = require('./bootstrap/bs-vars.js')
 var $mixins = require('./bootstrap/bs-mixins.js')
-
 var normalize = require('./bootstrap/normalize.js')
 var scaffolding = require('./bootstrap/scaffolding.js')
 var alert = require('./bootstrap/alert.js')
@@ -18,18 +17,18 @@ var obj = extend (
   {
     $vars:extend({
       'state1-success-bg': '#dff0d8',
-      'padding': '10px',
-      content: 'escape(\'a=1\')'
+      padding: '10px',
+      // fontFamily: '"s  adf", asdf',
+      // border: '1px solid black',
+      content2: 'escape(\'a=1\')',
+      color2: 'darken(spin(#dff0d8, -10), 5%)'
     }, $vars),
     $mixins: $mixins,
     'body ': {
-      content: 'escape(~\'a=1\')',
-      color: 'darken(spin(#dff0d8, -10), 5%)',
-      // fontFamily: '"s  adf", asdf',
-      // border: '1px solid black',
       padding: '@padding'
     },
     '#control': {
+      $extend: 'body ',
       marginBottom: '20px',
       span:{
         paddingLeft: '10px'

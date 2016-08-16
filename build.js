@@ -286,23 +286,6 @@ function getSel(node, result) {
 
 }
 
-function extendSel(result, sourceNode, target) {
-  var isRegExp = type.call(target)=='[object RegExp]'
-  result.nodes.forEach(function(node) {
-    var selTextPart = node.selTextPart
-    if(!selTextPart || sourceNode.parentRule !== node.parentRule) return
-    sourceNode.selTextPart.forEach(function(source) {
-      ![].push.apply(selTextPart, selTextPart.filter(function(v) {
-        return isRegExp
-          ? v.match(target)
-          : v==target
-      }).map(function(v) {
-        return isRegExp ? v.replace(target, source) : source
-      }))
-    })
-  })
-}
-
 function parseProp (node, d, key, result) {
   var prevVal = node.prevVal
   var lastVal = node.lastVal
@@ -314,8 +297,6 @@ function parseProp (node, d, key, result) {
     var val = typeof v == 'function'
         ? v.call(node.lastVal, prev, node, result)
         : v
-
-    if(val && key=='$extend') extendSel(result, node, val)
 
     node.rawVal[key] = val
     val = applyPlugins(result.options, 'value', val, key, node, result)
@@ -4111,7 +4092,6 @@ var lessobj = require('./lessobj.js')
 
 var $vars = require('./bootstrap/bs-vars.js')
 var $mixins = require('./bootstrap/bs-mixins.js')
-
 var normalize = require('./bootstrap/normalize.js')
 var scaffolding = require('./bootstrap/scaffolding.js')
 var alert = require('./bootstrap/alert.js')
@@ -4125,18 +4105,18 @@ var obj = extend (
   {
     $vars:extend({
       'state1-success-bg': '#dff0d8',
-      'padding': '10px',
-      content: 'escape(\'a=1\')'
+      padding: '10px',
+      // fontFamily: '"s  adf", asdf',
+      // border: '1px solid black',
+      content2: 'escape(\'a=1\')',
+      color2: 'darken(spin(#dff0d8, -10), 5%)'
     }, $vars),
     $mixins: $mixins,
     'body ': {
-      content: 'escape(~\'a=1\')',
-      color: 'darken(spin(#dff0d8, -10), 5%)',
-      // fontFamily: '"s  adf", asdf',
-      // border: '1px solid black',
       padding: '@padding'
     },
     '#control': {
+      $extend: 'body ',
       marginBottom: '20px',
       span:{
         paddingLeft: '10px'
@@ -4477,19 +4457,45 @@ var lessHelper = require('./less-helper.js')
 var parser = require('./less-parser.js')
 var cssobj = typeof cssobj=='undefined' ? require('cssobj') : cssobj
 
+
+// support for $extend key as value plugin
+function extendSel(result, sourceNode, target) {
+  var isRegExp = {}.toString.call(target)=='[object RegExp]'
+  result.nodes.forEach(function(node) {
+    if(sourceNode.extendedNodes.indexOf(node)>-1) return
+    var selTextPart = node.selTextPart
+    if(!selTextPart || sourceNode.parentRule !== node.parentRule) return
+    sourceNode.selTextPart.forEach(function(source) {
+      var extArr = selTextPart.filter(function(v) {
+        return isRegExp
+          ? v.match(target)
+          : v==target
+      }).map(function(v) {
+        return isRegExp ? v.replace(target, source) : source
+      })
+      if(extArr.length) {
+        ![].push.apply(selTextPart, extArr)
+        sourceNode.extendedNodes.push(node)
+      }
+    })
+  })
+}
+
+function extendPlugin(val, key, node, result) {
+  node.extendedNodes = node.extendedNodes || []
+  if(val && key=='$extend') extendSel(result, node, val)
+  return val
+}
+
 function lessObj(obj, option, data) {
   parser.transform(obj)
 
   option = option||{}
+  var plugins = option.plugins = option.plugins||{}
 
-  option = extend(option, {
-    plugins:{
-      value: lessHelper.lessValuePlugin()
-    }
-  })
+  plugins.value = [extendPlugin, lessHelper.lessValuePlugin()].concat(plugins.value||[])
 
   return cssobj(obj, option, data)
-
 }
 
 module.exports = lessObj
