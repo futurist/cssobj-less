@@ -1,12 +1,12 @@
 {
   "name": "cssobj-less",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Less in JS, using cssobj lib.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "objutil": "rollup -c ./node_modules/objutil/rollup.config.js --obj 'merge'",
-    "make": "npm run objutil && browserify src/index.js -o build.js",
+    "make": "npm run objutil && browserify src/index.js -o build.js && gulp bump",
     "watch": "npm run objutil && watchify src/index.js -o build.js",
     "bump": "gulp bump"
   },

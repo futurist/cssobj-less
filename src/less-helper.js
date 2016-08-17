@@ -25,11 +25,11 @@ function hasFunction(name) {
 
 function getFuncion(name) {
   var args = [].slice.call(arguments, 1)
-  return function(prev, node) {
+  return function(prev, node, result) {
     var ret = Functions.functionRegistry.get(name).apply(null, args.map(function(val) {
       return _getObj(val, node)
     }))
-    return this && this!==window ? ret.toCSS() : ret
+    return result ? ret.toCSS() : ret
   }
 }
 
@@ -70,7 +70,7 @@ function getVar(name, context) {
 // operation for css value, Dimension, Color
 function Operation(op1) {
   var args = [].slice.call(arguments, 1)
-  return function(prev, node) {
+  return function(prev, node, result) {
     var val = args.reduce(function(prev,cur) {
       prev.push(cur)
       if(prev.length<3) return prev
@@ -84,7 +84,7 @@ function Operation(op1) {
         return [p[0].operate({}, p[1], p[2])]
       }
     }, [op1])
-    return this && this!==window ? val.pop().toCSS() : val.pop()
+    return result ? val.pop().toCSS() : val.pop()
   }
 }
 
