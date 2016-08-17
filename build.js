@@ -3259,7 +3259,7 @@ module.exports = Variable;
 },{"./node":29}],36:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', { value: true });
+// Object.defineProperty(exports, '__esModule', { value: true });
 
 // better type check
 var is = function (t, v) { return {}.toString.call(v).slice(8, -1) === t }
@@ -4216,14 +4216,14 @@ function getFuncion(name) {
     var ret = Functions.functionRegistry.get(name).apply(null, args.map(function(val) {
       return _getObj(val, node)
     }))
-    return this ? ret.toCSS() : ret
+    return this && this!==window ? ret.toCSS() : ret
   }
 }
 
 function _getObj(v, node) {
   if(v.type) return v
-  if(typeof v=='function') return v.call(null, null, node)
-  return typeof v=='string' && v.charAt(0)=='@' ? getObj(getVar(v)(null,node)) : getObj(v)
+  if(typeof v=='function') return _getObj(v.call(null, null, node))
+  return typeof v=='string' && v.charAt(0)=='@' ? getObj(_getVar(v, node)) : getObj(v)
 }
 
 function _getVar(name, node) {
@@ -4271,7 +4271,7 @@ function Operation(op1) {
         return [p[0].operate({}, p[1], p[2])]
       }
     }, [op1])
-    return this ? val.pop().toCSS() : val.pop()
+    return this && this!==window ? val.pop().toCSS() : val.pop()
   }
 }
 
@@ -4360,6 +4360,7 @@ function parseExpression(str) {
 
   var arr = []
   parseStr(str, arr)
+  if(str=='((@navbar-height - @line-height-computed) / 2)') console.log(str, arr)
   // console.log(arr, arr.join(''))
   // console.log( 3333, arr[0], applyArr(arr[0]) )
   return Array.isArray(arr[0]) ? applyArr(arr[0]) : arr.join('')
