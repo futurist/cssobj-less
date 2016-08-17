@@ -29,7 +29,8 @@ function parseExpression(str) {
 
   var arr = []
   parseStr(str, arr)
-  if(str=='((@navbar-height - @line-height-computed) / 2)') console.log(str, arr)
+  
+  // if(str=='((@navbar-height - @line-height-computed) / 2)') console.log(str, arr)
   // console.log(arr, arr.join(''))
   // console.log( 3333, arr[0], applyArr(arr[0]) )
   return Array.isArray(arr[0]) ? applyArr(arr[0]) : arr.join('')

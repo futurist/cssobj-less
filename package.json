@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "make": "browserify src/index.js -o build.js",
-    "watch": "watchify src/index.js -o build.js",
+    "objutil": "rollup -c ./node_modules/objutil/rollup.config.js --obj 'merge'",
+    "make": "npm run objutil && browserify src/index.js -o build.js",
+    "watch": "npm run objutil && watchify src/index.js -o build.js",
     "bump": "gulp bump"
   },
   "keywords": [

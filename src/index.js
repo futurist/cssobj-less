@@ -1,5 +1,5 @@
 
-var extend = require('objutil').extend
+var merge = require('objutil').merge
 var lessobj = require('./lessobj.js')
 
 var $vars = require('./bootstrap/bs-vars.js')
@@ -8,14 +8,14 @@ var normalize = require('./bootstrap/normalize.js')
 var scaffolding = require('./bootstrap/scaffolding.js')
 var alert = require('./bootstrap/alert.js')
 
-// extend will overwrite normalize rule
+// merge will overwrite normalize rule
 // make it seperate cssobj first
 // lessobj(normalize)
 
-var obj = extend (
+var obj = merge (
   //css for page
   {
-    $vars:extend({
+    $vars:merge({
       'state1-success-bg': '#dff0d8',
       padding: '10px',
       // fontFamily: '"s  adf", asdf',

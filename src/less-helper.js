@@ -3,7 +3,7 @@
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/call
 
 
-var _extend = require('objutil').extend
+var merge = require('objutil').merge
 var ColorNames = require('less/lib/less/data/colors')
 var Color = require('less/lib/less/tree/color')
 var Dimension = require('less/lib/less/tree/dimension')
@@ -15,7 +15,7 @@ function mixin() {
   args.forEach(function(v) {
     v.$vars = v.$vars || {}
   })
-  return _extend.apply(null, args)
+  return merge.apply(null, args)
 }
 
 // invoke LESS Functions with param

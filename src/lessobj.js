@@ -1,6 +1,5 @@
 // less obj wrapper
 
-var extend = require('objutil').extend
 var parser = require('./less-parser.js')
 var cssobj = typeof cssobj=='undefined' ? require('cssobj') : cssobj
 

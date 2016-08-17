@@ -3259,7 +3259,7 @@ module.exports = Variable;
 },{"./node":29}],36:[function(require,module,exports){
 'use strict';
 
-// Object.defineProperty(exports, '__esModule', { value: true });
+Object.defineProperty(exports, '__esModule', { value: true });
 
 // better type check
 var is = function (t, v) { return {}.toString.call(v).slice(8, -1) === t }
@@ -3286,17 +3286,7 @@ function deepIt (a, b, callback, path) {
   return a
 }
 
-function get(obj, p, errNotFound) {
-  var n = obj
-  for(var i = 0, len = p.length; i < len; i++) {
-    if(!isIterable(n) || !(p[i] in n))
-      return errNotFound ? new Error('NotFound') : undefined
-    n = n[p[i]]
-  }
-  return n
-}
-
-function extend () {
+function merge () {
   var arg = arguments, last
   for(var i=arg.length; i--;) {
     last = deepIt(arg[i], last, function (a, b, key, path, inA) {
@@ -3306,58 +3296,7 @@ function extend () {
   return last
 }
 
-/** Usage: _exlucde(obj, {x:{y:2, z:3} } ) will delete x.y,x.z on obj
- *  when isSet, will set value to a instead of delete
- */
-// _exclude( {a:1,b:{d:{ c:2} } }, { b:{d:{ c:1} } } )
-function exclude (x, y, isSet) {
-  return deepIt(x, y, function (a, b, key) {
-    if (isPrimitive(b[key])) {
-      isSet
-        ? (key in a ? a[key] = b[key] : '')
-      : (b[key] ? delete a[key] : '')
-    }
-  })
-}
-
-function pick(obj, props) {
-  var o={}
-  return deepIt(o, props, function(a,b,key,path){
-    var c = get(obj,path.concat(key))
-    if(!b[key]) return
-    if(!isPrimitive(c)) a[key] = is('Array', c) ? [] : {}
-    if(isPrimitive(b[key])) a[key] = c
-  })
-}
-
-function pick2(obj, props) {
-  props=props||{}
-  var o={}
-  return deepIt(o, obj, function(a,b,key,path){
-    var c = get(props,path.concat(key))
-    if(c && isPrimitive(c)) return
-    if(!isPrimitive(b[key])) a[key] = is('Array', b[key]) ? [] : {}
-    else a[key]= b[key]
-  })
-}
-
-function defaults(obj, option) {
-  return deepIt(obj, option, function(a,b,key){
-    if(!(key in a)) a[key]=b[key]
-  })
-}
-
-exports.is = is;
-exports.own = own;
-exports.isIterable = isIterable;
-exports.isPrimitive = isPrimitive;
-exports.deepIt = deepIt;
-exports.get = get;
-exports.extend = extend;
-exports.exclude = exclude;
-exports.pick = pick;
-exports.pick2 = pick2;
-exports.defaults = defaults;
+exports.merge = merge;
 },{}],37:[function(require,module,exports){
 var obj = {
   '.alert': {
@@ -4087,7 +4026,7 @@ module.exports = obj
 
 },{}],42:[function(require,module,exports){
 
-var extend = require('objutil').extend
+var merge = require('objutil').merge
 var lessobj = require('./lessobj.js')
 
 var $vars = require('./bootstrap/bs-vars.js')
@@ -4096,14 +4035,14 @@ var normalize = require('./bootstrap/normalize.js')
 var scaffolding = require('./bootstrap/scaffolding.js')
 var alert = require('./bootstrap/alert.js')
 
-// extend will overwrite normalize rule
+// merge will overwrite normalize rule
 // make it seperate cssobj first
 // lessobj(normalize)
 
-var obj = extend (
+var obj = merge (
   //css for page
   {
-    $vars:extend({
+    $vars:merge({
       'state1-success-bg': '#dff0d8',
       padding: '10px',
       // fontFamily: '"s  adf", asdf',
@@ -4190,7 +4129,7 @@ window.onload = function() {
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/call
 
 
-var _extend = require('objutil').extend
+var merge = require('objutil').merge
 var ColorNames = require('less/lib/less/data/colors')
 var Color = require('less/lib/less/tree/color')
 var Dimension = require('less/lib/less/tree/dimension')
@@ -4202,7 +4141,7 @@ function mixin() {
   args.forEach(function(v) {
     v.$vars = v.$vars || {}
   })
-  return _extend.apply(null, args)
+  return merge.apply(null, args)
 }
 
 // invoke LESS Functions with param
@@ -4360,7 +4299,8 @@ function parseExpression(str) {
 
   var arr = []
   parseStr(str, arr)
-  if(str=='((@navbar-height - @line-height-computed) / 2)') console.log(str, arr)
+  
+  // if(str=='((@navbar-height - @line-height-computed) / 2)') console.log(str, arr)
   // console.log(arr, arr.join(''))
   // console.log( 3333, arr[0], applyArr(arr[0]) )
   return Array.isArray(arr[0]) ? applyArr(arr[0]) : arr.join('')
@@ -4479,7 +4419,6 @@ module.exports = {
 },{"./less-helper.js":43}],45:[function(require,module,exports){
 // less obj wrapper
 
-var extend = require('objutil').extend
 var parser = require('./less-parser.js')
 var cssobj = typeof cssobj=='undefined' ? require('cssobj') : cssobj
 
@@ -4528,4 +4467,4 @@ module.exports = lessObj
 
 
 
-},{"./less-parser.js":44,"cssobj":1,"objutil":36}]},{},[42]);
+},{"./less-parser.js":44,"cssobj":1}]},{},[42]);
