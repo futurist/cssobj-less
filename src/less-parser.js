@@ -67,13 +67,33 @@ function parseStr(val, callArr, parent) {
 
   // test if current context is function
   var isInFunction = typeof callArr[0]==='function'
+  var isJoinArr = callArr[0] === lessHelper.joinVar
+
+  if(!isInFunction && val.indexOf('@')>-1) {
+    // parse all @var in string
+    var arr = [lessHelper.joinVar]
+    callArr.push(arr)
+    return parseStr(val, arr, {callArr: callArr, parent:parent})
+  }
+
+  if(isJoinArr) {
+    // joinArr only has 2 case:
+    // 1. @var
+    // 2. no @ in string
+    var match = val.match(/^([^@]+)(.*)$/i)  // no @ in string
+        || val.match(/^(@[a-z0-9$_\-]+)(.*)$/i)  // @var
+    if(match) {
+      callArr.push(match[1])
+      return parseStr(match[2], callArr, parent)
+    }
+  }
 
   if(isInFunction) {
     // color rgba(), #333, @var-name
     var match = val.match(/^\s*(rgba?\([^)]*\))(.*)$/i)  //rgba
       || val.match(/^\s*(#[0-9A-F]+)(.*)$/i)  //#333
-      || val.match(/^\s*(@[a-z0-9$-]+)(.*)\s*$/i) //@var-name
-      || val.match(/^\s*([0-9.-]+[a-z%]*)(.*)\s*$/i)  //-10px
+      || val.match(/^\s*(@[a-z0-9$_\-]+)(.*)\s*$/i) //@var-name
+      || val.match(/^\s*([0-9.\-]+[a-z%]*)(.*)\s*$/i)  //-10px
       || val.match(/^\s*([\+\-\*\/])(.*)\s*$/)  // +-*/
       || val.match(/(~?""|~?".*?[^\\]")(.*)\s*$/)  // "con\\"tent" quoted string
       || val.match(/(~?''|~?'.*?[^\\]')(.*)\s*$/)  // 'con\\'tent' quoted string
@@ -97,6 +117,7 @@ function parseStr(val, callArr, parent) {
       return parseStr(match[1], callArr, parent)
     }
   }
+
   // end
   if(/^\s*$/.test(val)) {
     return callArr

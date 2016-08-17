@@ -1,7 +1,6 @@
 // less obj wrapper
 
 var extend = require('objutil').extend
-var lessHelper = require('./less-helper.js')
 var parser = require('./less-parser.js')
 var cssobj = typeof cssobj=='undefined' ? require('cssobj') : cssobj
 
@@ -41,7 +40,7 @@ function lessObj(obj, option, data) {
   option = option||{}
   var plugins = option.plugins = option.plugins||{}
 
-  plugins.value = [extendPlugin, lessHelper.lessValuePlugin()].concat(plugins.value||[])
+  plugins.value = [extendPlugin].concat(plugins.value||[])
 
   return cssobj(obj, option, data)
 }

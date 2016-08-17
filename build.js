@@ -4113,7 +4113,8 @@ var obj = extend (
     }, $vars),
     $mixins: $mixins,
     'body ': {
-      padding: '@padding'
+      padding: '@padding',
+      margin: '@padding 0'
     },
     '#control': {
       $extend: 'body ',
@@ -4234,6 +4235,16 @@ function _getVar(name, node) {
   }
 }
 
+// join multiple @var and string
+function joinVar() {
+  var args = [].slice.call(arguments)
+  return function (prev, node) {
+    return args.map(function(v) {
+      return v.charAt(0)=='@' ? _getVar(v, node) : v
+    }).join('')
+  }
+}
+
 // getVar from node.$var value
 function getVar(name, context) {
   context = context || {}
@@ -4292,12 +4303,6 @@ var getObj = function(val) {
   return val
 }
 
-function lessValuePlugin(option) {
-  return function(val,key,node,result) {
-    return typeof val=='string' && val.charAt(0)=='@' ? getVar(val)(val,node) : val
-  }
-}
-
 function getMixin (obj) {
   return function() {
     var keys = obj.$vars ? Object.keys(obj.$vars) : ''
@@ -4311,6 +4316,7 @@ function getMixin (obj) {
 module.exports = {
   mixin : mixin,
   getVar : getVar,
+  joinVar : joinVar,
   getObj : getObj,
   hasFunction : hasFunction,
   getFuncion : getFuncion,
@@ -4319,8 +4325,7 @@ module.exports = {
   ColorNames : ColorNames,
   Color : Color,
   Dimension : Dimension,
-  Functions : Functions,
-  lessValuePlugin : lessValuePlugin,
+  Functions : Functions
 }
 
 },{"less/lib/less/data/colors":3,"less/lib/less/functions":11,"less/lib/less/tree/color":20,"less/lib/less/tree/dimension":24,"less/lib/less/tree/quoted":32,"objutil":36}],44:[function(require,module,exports){
@@ -4393,13 +4398,33 @@ function parseStr(val, callArr, parent) {
 
   // test if current context is function
   var isInFunction = typeof callArr[0]==='function'
+  var isJoinArr = callArr[0] === lessHelper.joinVar
+
+  if(!isInFunction && val.indexOf('@')>-1) {
+    // parse all @var in string
+    var arr = [lessHelper.joinVar]
+    callArr.push(arr)
+    return parseStr(val, arr, {callArr: callArr, parent:parent})
+  }
+
+  if(isJoinArr) {
+    // joinArr only has 2 case:
+    // 1. @var
+    // 2. no @ in string
+    var match = val.match(/^([^@]+)(.*)$/i)  // no @ in string
+        || val.match(/^(@[a-z0-9$_\-]+)(.*)$/i)  // @var
+    if(match) {
+      callArr.push(match[1])
+      return parseStr(match[2], callArr, parent)
+    }
+  }
 
   if(isInFunction) {
     // color rgba(), #333, @var-name
     var match = val.match(/^\s*(rgba?\([^)]*\))(.*)$/i)  //rgba
       || val.match(/^\s*(#[0-9A-F]+)(.*)$/i)  //#333
-      || val.match(/^\s*(@[a-z0-9$-]+)(.*)\s*$/i) //@var-name
-      || val.match(/^\s*([0-9.-]+[a-z%]*)(.*)\s*$/i)  //-10px
+      || val.match(/^\s*(@[a-z0-9$_\-]+)(.*)\s*$/i) //@var-name
+      || val.match(/^\s*([0-9.\-]+[a-z%]*)(.*)\s*$/i)  //-10px
       || val.match(/^\s*([\+\-\*\/])(.*)\s*$/)  // +-*/
       || val.match(/(~?""|~?".*?[^\\]")(.*)\s*$/)  // "con\\"tent" quoted string
       || val.match(/(~?''|~?'.*?[^\\]')(.*)\s*$/)  // 'con\\'tent' quoted string
@@ -4423,6 +4448,7 @@ function parseStr(val, callArr, parent) {
       return parseStr(match[1], callArr, parent)
     }
   }
+
   // end
   if(/^\s*$/.test(val)) {
     return callArr
@@ -4453,7 +4479,6 @@ module.exports = {
 // less obj wrapper
 
 var extend = require('objutil').extend
-var lessHelper = require('./less-helper.js')
 var parser = require('./less-parser.js')
 var cssobj = typeof cssobj=='undefined' ? require('cssobj') : cssobj
 
@@ -4493,7 +4518,7 @@ function lessObj(obj, option, data) {
   option = option||{}
   var plugins = option.plugins = option.plugins||{}
 
-  plugins.value = [extendPlugin, lessHelper.lessValuePlugin()].concat(plugins.value||[])
+  plugins.value = [extendPlugin].concat(plugins.value||[])
 
   return cssobj(obj, option, data)
 }
@@ -4502,4 +4527,4 @@ module.exports = lessObj
 
 
 
-},{"./less-helper.js":43,"./less-parser.js":44,"cssobj":1,"objutil":36}]},{},[42]);
+},{"./less-parser.js":44,"cssobj":1,"objutil":36}]},{},[42]);

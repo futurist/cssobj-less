@@ -25,7 +25,8 @@ var obj = extend (
     }, $vars),
     $mixins: $mixins,
     'body ': {
-      padding: '@padding'
+      padding: '@padding',
+      margin: '@padding 0'
     },
     '#control': {
       $extend: 'body ',

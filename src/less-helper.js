@@ -48,6 +48,16 @@ function _getVar(name, node) {
   }
 }
 
+// join multiple @var and string
+function joinVar() {
+  var args = [].slice.call(arguments)
+  return function (prev, node) {
+    return args.map(function(v) {
+      return v.charAt(0)=='@' ? _getVar(v, node) : v
+    }).join('')
+  }
+}
+
 // getVar from node.$var value
 function getVar(name, context) {
   context = context || {}
@@ -106,12 +116,6 @@ var getObj = function(val) {
   return val
 }
 
-function lessValuePlugin(option) {
-  return function(val,key,node,result) {
-    return typeof val=='string' && val.charAt(0)=='@' ? getVar(val)(val,node) : val
-  }
-}
-
 function getMixin (obj) {
   return function() {
     var keys = obj.$vars ? Object.keys(obj.$vars) : ''
@@ -125,6 +129,7 @@ function getMixin (obj) {
 module.exports = {
   mixin : mixin,
   getVar : getVar,
+  joinVar : joinVar,
   getObj : getObj,
   hasFunction : hasFunction,
   getFuncion : getFuncion,
@@ -133,6 +138,5 @@ module.exports = {
   ColorNames : ColorNames,
   Color : Color,
   Dimension : Dimension,
-  Functions : Functions,
-  lessValuePlugin : lessValuePlugin,
+  Functions : Functions
 }
