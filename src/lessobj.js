@@ -1,7 +1,7 @@
 // less obj wrapper
 
 var parser = require('./less-parser.js')
-var cssobj = typeof cssobj=='undefined' ? require('cssobj') : cssobj
+var cssobj = typeof cssobj=='undefined' ? require('../../cssobj/dist/cssobj.cjs.js') : cssobj
 
 
 // support for $extend key as value plugin
@@ -27,19 +27,23 @@ function extendSel(result, sourceNode, target) {
   })
 }
 
-function extendPlugin(val, key, node, result) {
-  node.extendedNodes = node.extendedNodes || []
-  if(val && key=='$extend') extendSel(result, node, val)
-  return val
+function extendPlugin() {
+  return {
+    value: function (val, key, node, result) {
+      node.extendedNodes = node.extendedNodes || []
+      if(val && key=='$extend') extendSel(result, node, val)
+      return val
+    }
+  }
 }
 
 function lessObj(obj, option, data) {
   parser.transform(obj)
 
   option = option||{}
-  var plugins = option.plugins = option.plugins||{}
+  var plugins = option.plugins = option.plugins||[]
 
-  plugins.value = [extendPlugin].concat(plugins.value||[])
+  plugins.unshift(extendPlugin())
 
   return cssobj(obj, option, data)
 }
