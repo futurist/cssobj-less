@@ -15,7 +15,7 @@ npm i futurist/cssobj-less
 
 [Small Demo](https://futurist.github.io/cssobj-less/test/)
 
-### Write LESS in `folder` as your normal way:
+### 1. Write LESS in `folder` as your normal way:
 
 *file: lessfiles/page.less*
 
@@ -36,7 +36,7 @@ npm i futurist/cssobj-less
 }
 ```
 
-### Convert LESS to JS using [cssobjconv](https://github.com/cssobj/cssobj-converter)
+### 2. Convert LESS to JS using [cssobjconv](https://github.com/cssobj/cssobj-converter)
 
 ``` bash
 cssobjconv -d lessfiles
@@ -46,7 +46,7 @@ cssobjconv -d lessfiles
 
 *Notice: you should add a variable, e.g. var page={} manually*
 
-### Include `lessfiles/page.less.js` into your `html`, with `dist/lessobj.js`
+### 3. Include `lessfiles/page.less.js` into your `html`, with `dist/lessobj.js`
 
 ``` html
 <script src="dist/lessobj.js"></script>
@@ -56,7 +56,7 @@ var result = lessobj(page)
 </script>
 ```
 
-### Enjoy LESS in JS! and you can update `@vars` as below:
+### 4. Enjoy LESS in JS! and you can update `@vars` as below:
 
 ``` javascript
 page.$vars.base = 'blue'
@@ -71,5 +71,17 @@ You can use `selector:extend(.abc)`, to **extend** the rule.
 
 Also, you can use `$test` as key to dynamically enable/disable the rule.
 
+
+## Features NOT Implemented
+
+http://lesscss.org/features/#features-overview-feature-escaping
+http://lesscss.org/features/#features-overview-feature-namespaces-and-accessors
+http://lesscss.org/features/#variables-feature-variable-interpolation
+http://lesscss.org/features/#mixin-guards-feature
+http://lesscss.org/features/#css-guards-feature
+
+As the base of [cssobj](https://github.com/cssobj/cssobj), some of the feature may **implemented differently**, you should use this lib as normal way as possible.
+
+## Copyright
 
 James Yang (c) 2016 MIT
