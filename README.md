@@ -15,9 +15,9 @@ npm i futurist/cssobj-less
 
 [Small Demo](https://futurist.github.io/cssobj-less/test/)
 
-1. Write LESS in `folder` as your normal way:
+### Write LESS in `folder` as your normal way:
 
-**file: lessfiles/page.less**
+*file: lessfiles/page.less*
 
 ``` less
 @base: #f938ab;
@@ -36,7 +36,7 @@ npm i futurist/cssobj-less
 }
 ```
 
-2. Convert LESS to JS using [cssobjconv](https://github.com/cssobj/cssobj-converter)
+### Convert LESS to JS using [cssobjconv](https://github.com/cssobj/cssobj-converter)
 
 ``` bash
 cssobjconv -d lessfiles
@@ -46,7 +46,7 @@ cssobjconv -d lessfiles
 
 *Notice: you should add a variable, e.g. var page={} manually*
 
-3. Include `lessfiles/page.less.js` into your `html`, with `dist/lessobj.js`
+### Include `lessfiles/page.less.js` into your `html`, with `dist/lessobj.js`
 
 ``` html
 <script src="dist/lessobj.js"></script>
@@ -56,7 +56,7 @@ var result = lessobj(page)
 </script>
 ```
 
-4. Enjoy LESS in JS! and you can update `@vars` as below:
+### Enjoy LESS in JS! and you can update `@vars` as below:
 
 ``` javascript
 page.$vars.base = 'blue'
