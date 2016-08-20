@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>lessobj test</title>
+    <script type="text/javascript" src="../dist/lessobj.js"></script>
+    <script type="text/javascript" src="./lessfiles/page.less.js"></script>
+    <script type="text/javascript" src="./displaycss.js"></script>
+    <script type="text/javascript">
+  var result = lessobj(page, {  onUpdate: displaycss(function(v) {
+    console.log(v)
+  })})
+  function update() {
+    page.$vars.base = '#'+(Math.random()*0xFFFFFF>>0).toString(16)
+    result.update()
+  }
+    </script>
+  </head>
+  <body>
+    <a href="https://github.com/futurist/cssobj-less">Github Repo</a><br>
+    1. please open console to see the result<br>
+    2. <button onclick="update()">Update Color</button>
+    <div class="box">
+      <div>Some Test Text</div>
+    </div>
+  </body>
+</html>

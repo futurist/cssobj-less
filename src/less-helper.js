@@ -43,6 +43,7 @@ function _getVar(name, node) {
   var parent = node, val
   while (parent) {
     var $vars = parent.children.$vars
+    // console.log(name, $vars&& $vars.prop)
     if($vars && (val = $vars.prop[name.slice(1)])) return val[0]
     parent = parent.parent
   }

@@ -1,4 +1,4 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.lessobj = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var contexts = {};
 module.exports = contexts;
 
@@ -2496,6 +2496,7 @@ function _getVar(name, node) {
   var parent = node, val
   while (parent) {
     var $vars = parent.children.$vars
+    // console.log(name, $vars&& $vars.prop)
     if($vars && (val = $vars.prop[name.slice(1)])) return val[0]
     parent = parent.parent
   }
@@ -2646,27 +2647,29 @@ function parseStr(val, callArr, parent) {
 
   val += ''
 
-  val = lessHelper.ColorNames[val] || val
-
-  // ceil()
-  var match = val.match(/^\s*([a-z]+)\((.*)\s*$/i)
-  if (match && lessHelper.hasFunction(match[1]) ) {
-    var arr = [lessHelper.getFuncion, match[1]]
-    callArr.push(arr)
-    return parseStr(match[2], arr, {callArr: callArr, parent:parent})
-  }
-
-  // operate()
-  var match = val.match(/^\s*\((.*)\s*$/i)
-  if(match) {
-    var arr = [lessHelper.Operation]
-    callArr.push(arr)
-    return parseStr(match[1], arr, {callArr: callArr, parent:parent})
-  }
-
   // test if current context is function
   var isInFunction = typeof callArr[0]==='function'
   var isJoinArr = callArr[0] === lessHelper.joinVar
+
+  val = lessHelper.ColorNames[val] || val
+
+  if(!isJoinArr) {
+    // ceil()
+    var match = val.match(/^\s*([a-z]+)\((.*)\s*$/i)
+    if (match && lessHelper.hasFunction(match[1]) ) {
+      var arr = [lessHelper.getFuncion, match[1]]
+      callArr.push(arr)
+      return parseStr(match[2], arr, {callArr: callArr, parent:parent})
+    }
+
+    // operate()
+    var match = val.match(/^\s*\((.*)\s*$/i)
+    if(match) {
+      var arr = [lessHelper.Operation]
+      callArr.push(arr)
+      return parseStr(match[1], arr, {callArr: callArr, parent:parent})
+    }
+  }
 
   if(!isInFunction && val.indexOf('@')>-1) {
     // parse all @var in string
@@ -2794,11 +2797,19 @@ function lessObj(obj, option, data) {
   return cssobj(obj, option, data)
 }
 
+
+lessObj.ColorNames = require('less/lib/less/data/colors')
+lessObj.Color = require('less/lib/less/tree/color')
+lessObj.Dimension = require('less/lib/less/tree/dimension')
+lessObj.Quoted = require('less/lib/less/tree/quoted')
+lessObj.Functions = require('less/lib/less/functions')().functionRegistry
+
+
 module.exports = lessObj
 
 
 
-},{"../../cssobj/dist/cssobj.cjs.js":39,"./less-parser.js":37}],39:[function(require,module,exports){
+},{"../../cssobj/dist/cssobj.cjs.js":39,"./less-parser.js":37,"less/lib/less/data/colors":2,"less/lib/less/functions":10,"less/lib/less/tree/color":19,"less/lib/less/tree/dimension":23,"less/lib/less/tree/quoted":31}],39:[function(require,module,exports){
 'use strict';
 
 // helper functions for cssobj
@@ -3672,4 +3683,5 @@ function cssobj(obj, option, initData) {
 }
 
 module.exports = cssobj;
-},{}]},{},[38]);
+},{}]},{},[38])(38)
+});

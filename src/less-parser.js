@@ -49,27 +49,29 @@ function parseStr(val, callArr, parent) {
 
   val += ''
 
-  val = lessHelper.ColorNames[val] || val
-
-  // ceil()
-  var match = val.match(/^\s*([a-z]+)\((.*)\s*$/i)
-  if (match && lessHelper.hasFunction(match[1]) ) {
-    var arr = [lessHelper.getFuncion, match[1]]
-    callArr.push(arr)
-    return parseStr(match[2], arr, {callArr: callArr, parent:parent})
-  }
-
-  // operate()
-  var match = val.match(/^\s*\((.*)\s*$/i)
-  if(match) {
-    var arr = [lessHelper.Operation]
-    callArr.push(arr)
-    return parseStr(match[1], arr, {callArr: callArr, parent:parent})
-  }
-
   // test if current context is function
   var isInFunction = typeof callArr[0]==='function'
   var isJoinArr = callArr[0] === lessHelper.joinVar
+
+  val = lessHelper.ColorNames[val] || val
+
+  if(!isJoinArr) {
+    // ceil()
+    var match = val.match(/^\s*([a-z]+)\((.*)\s*$/i)
+    if (match && lessHelper.hasFunction(match[1]) ) {
+      var arr = [lessHelper.getFuncion, match[1]]
+      callArr.push(arr)
+      return parseStr(match[2], arr, {callArr: callArr, parent:parent})
+    }
+
+    // operate()
+    var match = val.match(/^\s*\((.*)\s*$/i)
+    if(match) {
+      var arr = [lessHelper.Operation]
+      callArr.push(arr)
+      return parseStr(match[1], arr, {callArr: callArr, parent:parent})
+    }
+  }
 
   if(!isInFunction && val.indexOf('@')>-1) {
     // parse all @var in string

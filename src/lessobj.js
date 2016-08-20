@@ -48,6 +48,14 @@ function lessObj(obj, option, data) {
   return cssobj(obj, option, data)
 }
 
+
+lessObj.ColorNames = require('less/lib/less/data/colors')
+lessObj.Color = require('less/lib/less/tree/color')
+lessObj.Dimension = require('less/lib/less/tree/dimension')
+lessObj.Quoted = require('less/lib/less/tree/quoted')
+lessObj.Functions = require('less/lib/less/functions')().functionRegistry
+
+
 module.exports = lessObj
 
 

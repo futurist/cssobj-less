@@ -51,7 +51,7 @@ var obj = merge (
 
 var result = lessobj(obj, {
   local:{prefix:'my-prefix-'},
-  onUpdate: cssobj_plugin_post_csstext(function(v) {
+  onUpdate: displaycss(function(v) {
     console.log(v)
   })
 })

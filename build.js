@@ -3231,7 +3231,7 @@ var obj = merge (
 
 var result = lessobj(obj, {
   local:{prefix:'my-prefix-'},
-  onUpdate: cssobj_plugin_post_csstext(function(v) {
+  onUpdate: displaycss(function(v) {
     console.log(v)
   })
 })
@@ -3322,6 +3322,7 @@ function _getVar(name, node) {
   var parent = node, val
   while (parent) {
     var $vars = parent.children.$vars
+    // console.log(name, $vars&& $vars.prop)
     if($vars && (val = $vars.prop[name.slice(1)])) return val[0]
     parent = parent.parent
   }
@@ -3472,27 +3473,29 @@ function parseStr(val, callArr, parent) {
 
   val += ''
 
-  val = lessHelper.ColorNames[val] || val
-
-  // ceil()
-  var match = val.match(/^\s*([a-z]+)\((.*)\s*$/i)
-  if (match && lessHelper.hasFunction(match[1]) ) {
-    var arr = [lessHelper.getFuncion, match[1]]
-    callArr.push(arr)
-    return parseStr(match[2], arr, {callArr: callArr, parent:parent})
-  }
-
-  // operate()
-  var match = val.match(/^\s*\((.*)\s*$/i)
-  if(match) {
-    var arr = [lessHelper.Operation]
-    callArr.push(arr)
-    return parseStr(match[1], arr, {callArr: callArr, parent:parent})
-  }
-
   // test if current context is function
   var isInFunction = typeof callArr[0]==='function'
   var isJoinArr = callArr[0] === lessHelper.joinVar
+
+  val = lessHelper.ColorNames[val] || val
+
+  if(!isJoinArr) {
+    // ceil()
+    var match = val.match(/^\s*([a-z]+)\((.*)\s*$/i)
+    if (match && lessHelper.hasFunction(match[1]) ) {
+      var arr = [lessHelper.getFuncion, match[1]]
+      callArr.push(arr)
+      return parseStr(match[2], arr, {callArr: callArr, parent:parent})
+    }
+
+    // operate()
+    var match = val.match(/^\s*\((.*)\s*$/i)
+    if(match) {
+      var arr = [lessHelper.Operation]
+      callArr.push(arr)
+      return parseStr(match[1], arr, {callArr: callArr, parent:parent})
+    }
+  }
 
   if(!isInFunction && val.indexOf('@')>-1) {
     // parse all @var in string
@@ -3620,11 +3623,19 @@ function lessObj(obj, option, data) {
   return cssobj(obj, option, data)
 }
 
+
+lessObj.ColorNames = require('less/lib/less/data/colors')
+lessObj.Color = require('less/lib/less/tree/color')
+lessObj.Dimension = require('less/lib/less/tree/dimension')
+lessObj.Quoted = require('less/lib/less/tree/quoted')
+lessObj.Functions = require('less/lib/less/functions')().functionRegistry
+
+
 module.exports = lessObj
 
 
 
-},{"../../cssobj/dist/cssobj.cjs.js":45,"./less-parser.js":43}],45:[function(require,module,exports){
+},{"../../cssobj/dist/cssobj.cjs.js":45,"./less-parser.js":43,"less/lib/less/data/colors":2,"less/lib/less/functions":10,"less/lib/less/tree/color":19,"less/lib/less/tree/dimension":23,"less/lib/less/tree/quoted":31}],45:[function(require,module,exports){
 'use strict';
 
 // helper functions for cssobj
