@@ -1,5 +1,7 @@
 # cssobj-less
 
+[![Build Status](https://travis-ci.org/futurist/cssobj-less.svg?branch=master)](https://travis-ci.org/futurist/cssobj-less)
+
 Using LESS as JS Object, based on [cssobj](https://github.com/cssobj/cssobj)
 
 [Bootstrap in JS Demo](https://futurist.github.io/cssobj-less/) - [Github Repo](https://github.com/futurist/cssobj-less)

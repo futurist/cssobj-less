@@ -1,0 +1,35 @@
+* { box-sizing: border-box; }
+::before, ::after { box-sizing: border-box; }
+html { font-size: 10px; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); }
+body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.4; color: rgb(51, 51, 51); background-color: rgb(255, 255, 255); }
+input, button, select, textarea { font-family: inherit; font-size: inherit; line-height: inherit; }
+a { color: rgb(51, 122, 183); text-decoration: none; }
+a:hover, a:focus { color: rgb(34, 82, 123); text-decoration: underline; }
+a:focus { outline: -webkit-focus-ring-color auto 5px; outline-offset: -2px; }
+figure { margin: 0px; }
+img { vertical-align: middle; }
+.img-responsive { max-width: 100%; height: auto; }
+.img-thumbnail { padding: 4px; line-height: 1.4; background-color: rgb(255, 255, 255); border: 1px solid rgb(221, 221, 221); transition: all 0.2s ease-in-out; -webkit-transition: all 0.2s ease-in-out; max-width: 100%; height: auto; }
+hr { margin-top: 19px; margin-bottom: 19px; border-width: 1px 0px 0px; border-top-style: solid; border-top-color: rgb(238, 238, 238); }
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0px; overflow: hidden; clip: rect(0px 0px 0px 0px); border: 0px; }
+.sr-only-focusable:active, .sr-only-focusable:focus { position: static; width: auto; height: auto; margin: 0px; overflow: visible; clip: auto; }
+[role="button"] { cursor: pointer; }
+.alert { padding: 15px; margin-bottom: 19px; border: 1px solid transparent; }
+.alert h4 { margin-top: 0px; color: inherit; }
+.alert .alert-link { font-weight: bold; }
+.alert > p, .alert > ul { margin-bottom: 0px; }
+.alert > p + p { margin-top: 5px; }
+.alert-dismissable, .alert-dismissible { padding-right: 35px; }
+.alert-dismissable .close, .alert-dismissible .close { position: relative; top: -2px; right: -21px; color: inherit; }
+.alert-success { background-color: rgb(223, 240, 216); border-color: rgb(214, 233, 198); color: rgb(60, 118, 61); }
+.alert-success hr { border-top-color: rgb(201, 226, 180); }
+.alert-success .alert-link { color: rgb(43, 84, 44); }
+.alert-info { background-color: rgb(217, 237, 247); border-color: rgb(188, 232, 241); color: rgb(49, 112, 143); }
+.alert-info hr { border-top-color: rgb(167, 225, 237); }
+.alert-info .alert-link { color: rgb(36, 82, 105); }
+.alert-warning { background-color: rgb(252, 248, 227); border-color: rgb(250, 235, 204); color: rgb(138, 109, 59); }
+.alert-warning hr { border-top-color: rgb(248, 226, 181); }
+.alert-warning .alert-link { color: rgb(102, 81, 44); }
+.alert-danger { background-color: rgb(242, 222, 222); border-color: rgb(235, 204, 209); color: rgb(169, 68, 66); }
+.alert-danger hr { border-top-color: rgb(228, 186, 192); }
+.alert-danger .alert-link { color: rgb(132, 53, 52); }

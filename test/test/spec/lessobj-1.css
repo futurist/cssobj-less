@@ -1,0 +1,2 @@
+.box { width: 200px; padding: 10px; color: rgb(254, 51, 172); border-color: rgb(253, 205, 234); }
+.box div { box-shadow: rgba(0, 0, 0, 0.298039) 0px 0px 5px; }

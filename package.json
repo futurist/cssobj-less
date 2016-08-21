@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "browserify src/lessobj.js -o dist/lessobj.js -s lessobj",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "cd test/test && mocha",
     "objutil": "rollup -c ./node_modules/objutil/rollup.config.js --obj 'merge'",
     "make": "npm run objutil && browserify src/index.js -o build.js && gulp bump",
     "watch": "npm run objutil && watchify src/index.js -o build.js",
@@ -19,7 +19,9 @@
   "author": "James Yang <jamesyang999@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.0.2",
+    "walk": "^2.3.9"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }

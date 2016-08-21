@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>test for lessobj</title>
+    <script type="text/javascript" src="../../dist/lessobj.js"></script>
+    <script type="text/javascript" src="../../node_modules/objutil/dist/objutil.iife.js"></script>
+    <script type="text/javascript">
+
+window.css = function (result) {
+  var dom = result.cssdom
+  if(!dom) return ''
+  var sheet = dom.sheet || dom.styleSheet
+  if(sheet.cssText) return sheet.cssText
+  var str = ''
+  var rules = sheet.cssRules || sheet.rules
+  for(var i = 0, len = rules.length; i < len; i++) {
+    str += rules[i].cssText + '\n'
+  }
+  return str
+}
+
+window.log = function(str, str2) {
+  console.log(str + '******' + str2 + '------')
+}
+
+  </script>
+  </head>
+  <body>
+
+  </body>
+</html>
