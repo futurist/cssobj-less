@@ -16,6 +16,14 @@
     "cssobj",
     "bootstrap"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/futurist/cssobj-less.git"
+  },
+  "bugs": {
+    "url": "https://github.com/futurist/cssobj-less/issues"
+  },
+  "homepage": "https://github.com/futurist/cssobj-less#readme",
   "author": "James Yang <jamesyang999@gmail.com>",
   "license": "MIT",
   "devDependencies": {
@@ -23,5 +31,9 @@
     "mocha": "^3.0.2",
     "walk": "^2.3.9"
   },
-  "dependencies": {}
+  "dependencies": {
+    "cssobj": "git://github.com/cssobj/cssobj.git",
+    "less": "^2.7.1",
+    "objutil": "^1.0.15"
+  }
 }
