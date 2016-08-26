@@ -2412,8 +2412,6 @@ module.exports = Variable;
 },{"./node":28}],35:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', { value: true });
-
 // better type check
 var is = function (t, v) { return {}.toString.call(v).slice(8, -1) === t }
 var own = function (o, k) { return {}.hasOwnProperty.call(o, k) }
@@ -2787,14 +2785,13 @@ function extendPlugin() {
 }
 
 function lessObj(obj, option, data) {
-  parser.transform(obj)
 
   option = option||{}
   var plugins = option.plugins = option.plugins||[]
 
   plugins.unshift(extendPlugin())
 
-  return cssobj(obj, option, data)
+  return cssobj(parser.transform(obj), option, data)
 }
 
 

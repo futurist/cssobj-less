@@ -38,14 +38,13 @@ function extendPlugin() {
 }
 
 function lessObj(obj, option, data) {
-  parser.transform(obj)
 
   option = option||{}
   var plugins = option.plugins = option.plugins||[]
 
   plugins.unshift(extendPlugin())
 
-  return cssobj(obj, option, data)
+  return cssobj(parser.transform(obj), option, data)
 }
 
 

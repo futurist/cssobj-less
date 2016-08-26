@@ -7,13 +7,19 @@
     <script type="text/javascript" src="./lessfiles/page.less.js"></script>
     <script type="text/javascript" src="./displaycss.js"></script>
     <script type="text/javascript">
-  var result = lessobj(page, {  onUpdate: displaycss(function(v) {
+  var result = lessobj(JSON.parse(JSON.stringify(page)), {  onUpdate: displaycss(function(v) {
     console.log(v)
+    try{document.getElementById('css').value=v}catch(e){}
   })})
   function update() {
-    page.$vars.base = '#'+(Math.random()*0xFFFFFF>>0).toString(16)
+    result.obj.$vars.base = page.$vars.base = '#'+(Math.random()*0xFFFFFF>>0).toString(16)
+    updateSrc()
     result.update()
   }
+  function updateSrc(){
+    document.getElementById('src').value= JSON.stringify(page, null, 2)
+  }
+  window.onload = update
     </script>
   </head>
   <body>
@@ -23,5 +29,7 @@
     <div class="box">
       <div>Some Test Text</div>
     </div>
+    <textarea id="src" style="width:550px; height:475px;"></textarea><br>
+    <textarea id="css" style="width:550px; height:100px;"></textarea>
   </body>
 </html>
