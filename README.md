@@ -77,9 +77,13 @@ Also, you can use `$test` as key to dynamically enable/disable the rule.
 ## Features NOT Implemented
 
 http://lesscss.org/features/#features-overview-feature-escaping
+
 http://lesscss.org/features/#features-overview-feature-namespaces-and-accessors
+
 http://lesscss.org/features/#variables-feature-variable-interpolation
+
 http://lesscss.org/features/#mixin-guards-feature
+
 http://lesscss.org/features/#css-guards-feature
 
 As the base of [cssobj](https://github.com/cssobj/cssobj), some of the feature may **implemented differently**, you should use this lib as normal way as possible.
