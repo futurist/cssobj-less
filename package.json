@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "cssobj": "git://github.com/cssobj/cssobj.git",
-    "less": "^2.7.1",
+    "less": "^3.0.2",
     "objutil": "^1.0.15"
   }
 }
